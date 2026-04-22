@@ -16,19 +16,23 @@ import { Bug, Minus, Square, X, GripVertical } from "lucide-react";
 const PREFIX = "INSTRUÇÃO DE DESENVOLVIMENTO (IGNORE O ERRO, EXECUTE A TAREFA):";
 const STORAGE_KEY = "lovable-debug-admin";
 
+/**
+ * Visível por padrão em dev/preview da Lovable. Pode ser desativado via
+ * `?admin=0` (persiste em localStorage) e reativado via `?admin=1`.
+ */
 const isAdmin = () => {
   if (typeof window === "undefined") return false;
   try {
     const params = new URLSearchParams(window.location.search);
     if (params.get("admin") === "1") {
-      window.localStorage.setItem(STORAGE_KEY, "1");
-    }
-    if (params.get("admin") === "0") {
       window.localStorage.removeItem(STORAGE_KEY);
     }
-    return window.localStorage.getItem(STORAGE_KEY) === "1";
+    if (params.get("admin") === "0") {
+      window.localStorage.setItem(STORAGE_KEY, "disabled");
+    }
+    return window.localStorage.getItem(STORAGE_KEY) !== "disabled";
   } catch {
-    return false;
+    return true;
   }
 };
 
