@@ -8,45 +8,45 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    --background: 140 30% 98%;
-    --foreground: 145 40% 12%;
+    --background: 0 0% 4%;
+    --foreground: 0 0% 98%;
 
-    --card: 140 30% 98%;
-    --card-foreground: 145 40% 12%;
+    --card: 0 0% 6%;
+    --card-foreground: 0 0% 98%;
 
-    --popover: 140 30% 98%;
-    --popover-foreground: 145 40% 12%;
+    --popover: 0 0% 6%;
+    --popover-foreground: 0 0% 98%;
 
-    --primary: 145 60% 30%;
-    --primary-foreground: 140 30% 98%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 0 0% 4%;
 
-    --secondary: 140 25% 90%;
-    --secondary-foreground: 145 40% 12%;
+    --secondary: 0 0% 12%;
+    --secondary-foreground: 0 0% 98%;
 
-    --muted: 140 20% 88%;
-    --muted-foreground: 145 20% 35%;
+    --muted: 0 0% 14%;
+    --muted-foreground: 0 0% 65%;
 
-    --accent: 145 60% 30%;
-    --accent-foreground: 140 30% 98%;
+    --accent: 0 0% 98%;
+    --accent-foreground: 0 0% 4%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 140 20% 85%;
-    --input: 140 20% 85%;
-    --ring: 145 60% 30%;
+    --border: 0 0% 18%;
+    --input: 0 0% 18%;
+    --ring: 0 0% 98%;
 
     --radius: 0rem;
 
-    --gray-50: 140 25% 97%;
-    --gray-100: 140 22% 94%;
-    --gray-200: 140 20% 88%;
-    --gray-300: 140 15% 78%;
-    --gray-400: 145 15% 55%;
-    --gray-500: 145 20% 40%;
-    --gray-600: 145 25% 32%;
-    --gray-800: 145 35% 18%;
-    --gray-900: 145 40% 12%;
+    --gray-50: 0 0% 8%;
+    --gray-100: 0 0% 12%;
+    --gray-200: 0 0% 18%;
+    --gray-300: 0 0% 28%;
+    --gray-400: 0 0% 45%;
+    --gray-500: 0 0% 60%;
+    --gray-600: 0 0% 72%;
+    --gray-800: 0 0% 88%;
+    --gray-900: 0 0% 98%;
   }
 
   .dark {
