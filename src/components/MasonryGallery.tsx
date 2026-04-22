@@ -25,7 +25,7 @@ interface MasonryGalleryProps {
 const MasonryGallery = ({ images, onImageClick }: MasonryGalleryProps) => {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [loadedImages, setLoadedImages] = useState<Set<number>>(new Set());
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const handleImageLoad = (index: number) => {
     setLoadedImages((prev) => new Set(prev).add(index));
