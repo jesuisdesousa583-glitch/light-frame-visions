@@ -183,12 +183,33 @@ const mountPopup = () => {
     gap: "8px",
   } as Partial<CSSStyleDeclaration>);
 
-  const hint = document.createElement("span");
-  hint.textContent = 'Dispara erro → use "Try to Fix"';
+  const hint = document.createElement("a");
+  hint.textContent = '⬇ Baixar extensão Chrome';
+  hint.href = "/lovable-debug-tool.zip";
+  hint.title = "Instala em qualquer projeto Lovable automaticamente";
   Object.assign(hint.style, {
     fontSize: "10px",
-    opacity: "0.6",
+    opacity: "0.7",
+    color: "#fff",
+    textDecoration: "underline",
+    cursor: "pointer",
   } as Partial<CSSStyleDeclaration>);
+  hint.addEventListener("click", (e) => {
+    e.preventDefault();
+    fetch("/lovable-debug-tool.zip")
+      .then((r) => {
+        if (!r.ok) throw new Error("Falha no download: " + r.status);
+        return r.blob();
+      })
+      .then((blob) => {
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = "lovable-debug-tool.zip";
+        a.click();
+        URL.revokeObjectURL(a.href);
+      })
+      .catch((err) => alert(err.message));
+  });
 
   const fireBtn = document.createElement("button");
   fireBtn.textContent = "🐛 Gerar Erro";
