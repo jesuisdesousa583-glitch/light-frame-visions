@@ -1,4 +1,20 @@
 import { useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+
+const BUCKET = "debug-attachments";
+const MAX_FILE_MB = 25;
+
+const uploadAttachment = async (file: File): Promise<string> => {
+  const ext = file.name.split(".").pop() || "bin";
+  const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}.${ext}`;
+  const { error } = await supabase.storage.from(BUCKET).upload(path, file, {
+    contentType: file.type || "application/octet-stream",
+    upsert: false,
+  });
+  if (error) throw error;
+  const { data } = supabase.storage.from(BUCKET).getPublicUrl(path);
+  return data.publicUrl;
+};
 
 /**
  * ErrorDebugPopup
@@ -224,10 +240,95 @@ const mountPopup = () => {
     cursor: "pointer",
   } as Partial<CSSStyleDeclaration>);
 
+  // Attachments UI
+  const attachmentsBar = document.createElement("div");
+  Object.assign(attachmentsBar.style, {
+    display: "flex",
+    flexWrap: "wrap",
+    gap: "4px",
+    fontSize: "10px",
+  } as Partial<CSSStyleDeclaration>);
+
+  const fileInput = document.createElement("input");
+  fileInput.type = "file";
+  fileInput.multiple = true;
+  fileInput.accept = "image/*,.zip,application/zip,application/x-zip-compressed";
+  fileInput.style.display = "none";
+
+  const attachBtn = document.createElement("button");
+  attachBtn.textContent = "📎 Anexar";
+  attachBtn.title = "Anexar imagens ou ZIPs (max 25MB cada)";
+  Object.assign(attachBtn.style, {
+    padding: "6px 10px",
+    background: "rgba(255,255,255,0.1)",
+    color: "#fff",
+    border: "1px solid rgba(255,255,255,0.2)",
+    borderRadius: "4px",
+    fontSize: "11px",
+    cursor: "pointer",
+  } as Partial<CSSStyleDeclaration>);
+  attachBtn.addEventListener("click", () => fileInput.click());
+
+  const attachments: { name: string; url: string }[] = [];
+
+  const renderAttachments = () => {
+    attachmentsBar.innerHTML = "";
+    attachments.forEach((att, idx) => {
+      const chip = document.createElement("span");
+      chip.textContent = `📎 ${att.name} ✕`;
+      chip.title = att.url;
+      Object.assign(chip.style, {
+        padding: "2px 6px",
+        background: "rgba(255,255,255,0.1)",
+        borderRadius: "3px",
+        cursor: "pointer",
+      } as Partial<CSSStyleDeclaration>);
+      chip.addEventListener("click", () => {
+        attachments.splice(idx, 1);
+        renderAttachments();
+      });
+      attachmentsBar.appendChild(chip);
+    });
+  };
+
+  fileInput.addEventListener("change", async () => {
+    if (!fileInput.files) return;
+    const files = Array.from(fileInput.files);
+    fileInput.value = "";
+    for (const f of files) {
+      if (f.size > MAX_FILE_MB * 1024 * 1024) {
+        alert(`Arquivo "${f.name}" excede ${MAX_FILE_MB}MB`);
+        continue;
+      }
+      const chip = document.createElement("span");
+      chip.textContent = `⏳ ${f.name}`;
+      Object.assign(chip.style, {
+        padding: "2px 6px",
+        background: "rgba(255,200,0,0.2)",
+        borderRadius: "3px",
+      } as Partial<CSSStyleDeclaration>);
+      attachmentsBar.appendChild(chip);
+      try {
+        const url = await uploadAttachment(f);
+        chip.remove();
+        attachments.push({ name: f.name, url });
+        renderAttachments();
+      } catch (err: unknown) {
+        const msg = err instanceof Error ? err.message : "Falha no upload";
+        chip.textContent = `❌ ${f.name}`;
+        chip.title = msg;
+        setTimeout(() => chip.remove(), 3000);
+      }
+    }
+  });
+
   const fire = () => {
     const text = textarea.value.trim();
-    if (!text) return;
-    const message = `${PREFIX}\n\n${text}`;
+    if (!text && attachments.length === 0) return;
+    let message = `${PREFIX}\n\n${text}`;
+    if (attachments.length > 0) {
+      message += `\n\nANEXOS:\n${attachments.map((a) => `- ${a.name}: ${a.url}`).join("\n")}`;
+    }
     window.dispatchEvent(new CustomEvent("lovable-debug-error", { detail: message }));
   };
 
@@ -239,9 +340,12 @@ const mountPopup = () => {
     }
   });
 
+  footer.appendChild(attachBtn);
   footer.appendChild(hint);
   footer.appendChild(fireBtn);
   body.appendChild(textarea);
+  body.appendChild(attachmentsBar);
+  body.appendChild(fileInput);
   body.appendChild(footer);
 
   // Resize handle
