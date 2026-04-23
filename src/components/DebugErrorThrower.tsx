@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 /**
  * DebugErrorThrower
@@ -18,7 +18,6 @@ import { useEffect, useRef, useState } from "react";
  */
 const DebugErrorThrower = () => {
   const [message, setMessage] = useState<string | null>(null);
-  const lastMessageRef = useRef<string | null>(null);
 
   useEffect(() => {
     const handler = (event: Event) => {
@@ -26,8 +25,6 @@ const DebugErrorThrower = () => {
       if (typeof custom.detail !== "string" || custom.detail.length === 0) return;
 
       const nextMessage = custom.detail;
-      lastMessageRef.current = nextMessage;
-
       setMessage((current) => {
         if (current === nextMessage) {
           return `${nextMessage}\n\n[retry:${Date.now()}]`;
