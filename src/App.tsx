@@ -10,8 +10,6 @@ import Project from "./pages/Project";
 import CategoryGallery from "./pages/CategoryGallery";
 import NotFound from "./pages/NotFound";
 import ErrorBoundary from "./components/ErrorBoundary";
-import DebugErrorThrower from "./components/DebugErrorThrower";
-import ErrorDebugPopup from "./components/ErrorDebugPopup";
 
 const queryClient = new QueryClient();
 
@@ -19,10 +17,6 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
       <TooltipProvider>
-        {/* DebugErrorThrower DEVE ficar FORA do ErrorBoundary para que o erro
-            intencional escape até o overlay global da Lovable. NÃO MOVER. */}
-        <DebugErrorThrower />
-        <ErrorDebugPopup />
         <ErrorBoundary>
           <Toaster />
           <Sonner />
