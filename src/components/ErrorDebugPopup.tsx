@@ -40,6 +40,35 @@ const POS_KEY = "lovable-debug-pos";
 const SIZE_KEY = "lovable-debug-size";
 const MIN_KEY = "lovable-debug-min";
 const TEXT_KEY = "lovable-debug-text";
+const TAB_KEY = "lovable-debug-tab";
+const IMG_PROMPT_KEY = "lovable-debug-img-prompt";
+const PRESET_KEY = "lovable-debug-preset";
+
+type Preset = { id: string; label: string; spec: string };
+const PRESETS: Preset[] = [
+  { id: "ig-post", label: "Instagram Post (1:1)", spec: "1080x1080" },
+  { id: "ig-story", label: "Instagram Story (9:16)", spec: "1080x1920" },
+  { id: "fb-post", label: "Facebook Post (1.91:1)", spec: "1200x630" },
+  { id: "yt-thumb", label: "YouTube Thumb (16:9)", spec: "1280x720" },
+  { id: "linkedin", label: "LinkedIn (1.91:1)", spec: "1200x627" },
+  { id: "bg-remove", label: "Remover fundo", spec: "PNG transparente" },
+  { id: "bg-replace", label: "Trocar fundo", spec: "manter sujeito" },
+  { id: "enhance", label: "Melhorar qualidade", spec: "nitidez + cores" },
+  { id: "free", label: "Edição livre", spec: "—" },
+];
+
+const editImageViaAI = async (
+  imageUrls: string[],
+  prompt: string,
+  preset: string
+): Promise<string> => {
+  const { data, error } = await supabase.functions.invoke("edit-image", {
+    body: { imageUrls, prompt, preset },
+  });
+  if (error) throw error;
+  if (!data?.url) throw new Error(data?.error || "Sem URL retornada");
+  return data.url as string;
+};
 
 const isAdmin = () => {
   if (typeof window === "undefined") return false;
