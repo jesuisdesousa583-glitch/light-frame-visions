@@ -6,6 +6,31 @@ chrome.action.onClicked.addListener((tab) => {
   chrome.sidePanel.open({ tabId: tab.id });
 });
 
+const PREVIEW_URL_RE = /https:\/\/[^/]*\.(lovable\.app|lovableproject\.com)\//;
+
+const getPreviewTabs = async () => {
+  const tabs = await chrome.tabs.query({});
+  return tabs.filter((tab) => typeof tab.id === "number" && tab.url && PREVIEW_URL_RE.test(tab.url));
+};
+
+const fireDebugErrorInTab = async (tabId, payload) => {
+  await chrome.scripting.executeScript({
+    target: { tabId },
+    func: (msg) => {
+      window.dispatchEvent(new CustomEvent("lovable-debug-error", { detail: msg }));
+
+      setTimeout(() => {
+        const s = document.createElement("script");
+        s.textContent =
+          "setTimeout(function(){throw new Error(" + JSON.stringify(msg) + ");},0);";
+        (document.head || document.documentElement).appendChild(s);
+        s.remove();
+      }, 150);
+    },
+    args: [payload],
+  });
+};
+
 // Captura Bearer token das requisições à API da Lovable
 chrome.webRequest.onBeforeSendHeaders.addListener(
   (details) => {
@@ -18,9 +43,7 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
       ) {
         const token = header.value.replace("Bearer ", "").trim();
         chrome.storage.local.set({ bearerToken: token, tokenCapturedAt: Date.now() }, () => {
-          chrome.runtime
-            .sendMessage({ type: "TOKEN_CAPTURED", token })
-            .catch(() => {});
+          chrome.runtime.sendMessage({ type: "TOKEN_CAPTURED", token }).catch(() => {});
         });
         break;
       }
@@ -39,59 +62,60 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 
   if (message.type === "GET_COLLECTED_DATA") {
-    chrome.storage.local.get(
-      ["bearerToken", "projectId", "tokenCapturedAt"],
-      (data) => {
-        sendResponse({
-          bearerToken: data.bearerToken || null,
-          projectId: data.projectId || null,
-          tokenCapturedAt: data.tokenCapturedAt || null,
-        });
-      }
-    );
+    chrome.storage.local.get(["bearerToken", "projectId", "tokenCapturedAt"], (data) => {
+      sendResponse({
+        bearerToken: data.bearerToken || null,
+        projectId: data.projectId || null,
+        tokenCapturedAt: data.tokenCapturedAt || null,
+      });
+    });
     return true;
   }
 
   if (message.type === "CLEAR_DATA") {
-    chrome.storage.local.remove(
-      ["bearerToken", "projectId", "tokenCapturedAt"],
-      () => sendResponse({ success: true })
+    chrome.storage.local.remove(["bearerToken", "projectId", "tokenCapturedAt"], () =>
+      sendResponse({ success: true })
     );
     return true;
   }
 
-  // Encaminha CustomEvent para a aba ativa de preview (modo Debug Tool)
+  // Encaminha CustomEvent para qualquer aba de preview aberta (modo Debug Tool)
   if (message.type === "FIRE_DEBUG_ERROR") {
-    chrome.tabs.query({ active: true, currentWindow: false }, (tabs) => {
-      tabs.forEach((tab) => {
-        if (
-          tab.url &&
-          /https:\/\/[^/]*\.(lovable\.app|lovableproject\.com)\//.test(tab.url)
-        ) {
-          chrome.scripting
-            .executeScript({
-              target: { tabId: tab.id },
-              func: (msg) => {
-                window.dispatchEvent(
-                  new CustomEvent("lovable-debug-error", { detail: msg })
-                );
-                setTimeout(() => {
-                  const s = document.createElement("script");
-                  s.textContent =
-                    "setTimeout(function(){throw new Error(" +
-                    JSON.stringify(msg) +
-                    ");},0);";
-                  (document.head || document.documentElement).appendChild(s);
-                  s.remove();
-                }, 150);
-              },
-              args: [message.payload],
-            })
-            .catch(() => {});
+    (async () => {
+      try {
+        const previewTabs = await getPreviewTabs();
+
+        if (previewTabs.length === 0) {
+          sendResponse({
+            success: false,
+            error: "Nenhuma aba de preview encontrada. Abra uma URL .lovable.app ou .lovableproject.com.",
+          });
+          return;
         }
-      });
-    });
-    sendResponse({ success: true });
+
+        const settled = await Promise.allSettled(
+          previewTabs.map((tab) => fireDebugErrorInTab(tab.id, message.payload))
+        );
+
+        const successCount = settled.filter((result) => result.status === "fulfilled").length;
+
+        if (successCount === 0) {
+          sendResponse({
+            success: false,
+            error: "Não foi possível disparar o erro na aba de preview.",
+          });
+          return;
+        }
+
+        sendResponse({ success: true, count: successCount });
+      } catch (error) {
+        sendResponse({
+          success: false,
+          error: error instanceof Error ? error.message : String(error),
+        });
+      }
+    })();
+
     return true;
   }
 });
