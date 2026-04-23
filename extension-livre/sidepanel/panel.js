@@ -52,7 +52,7 @@ function updateReadiness() {
   const hasId = !!collectedData.projectId;
   if (mode === "debug") {
     readinessBar.className = "readiness-bar ready";
-    readinessText.textContent = "🐛 Modo Debug: pronto (precisa de aba de preview aberta)";
+    readinessText.textContent = "🐛 Modo Debug: pronto (editor com preview aberto ou aba published/preview)";
     return;
   }
   if (hasToken && hasId) {
@@ -175,7 +175,10 @@ async function sendViaDebug(message) {
       }
 
       if (!res?.success) {
-        showAlert("warning", res?.error || "Nenhuma aba de preview disponível para o Debug Tool.");
+        showAlert(
+          "warning",
+          res?.error || "Nenhum preview elegível foi encontrado. Abra o editor com o preview visível."
+        );
         resolve(false);
         return;
       }
@@ -183,7 +186,7 @@ async function sendViaDebug(message) {
       addChatMessage("user", message);
       addChatMessage(
         "bot",
-        `🐛 Erro disparado em ${res.count || 1} aba(s) de preview. Volte ao editor e clique em "Try to Fix".`
+        `🐛 Erro disparado em ${res.count || 1} frame(s) de preview. Volte ao editor e clique em "Try to Fix".`
       );
       resolve(true);
     });
