@@ -40,6 +40,35 @@ const POS_KEY = "lovable-debug-pos";
 const SIZE_KEY = "lovable-debug-size";
 const MIN_KEY = "lovable-debug-min";
 const TEXT_KEY = "lovable-debug-text";
+const TAB_KEY = "lovable-debug-tab";
+const IMG_PROMPT_KEY = "lovable-debug-img-prompt";
+const PRESET_KEY = "lovable-debug-preset";
+
+type Preset = { id: string; label: string; spec: string };
+const PRESETS: Preset[] = [
+  { id: "ig-post", label: "Instagram Post (1:1)", spec: "1080x1080" },
+  { id: "ig-story", label: "Instagram Story (9:16)", spec: "1080x1920" },
+  { id: "fb-post", label: "Facebook Post (1.91:1)", spec: "1200x630" },
+  { id: "yt-thumb", label: "YouTube Thumb (16:9)", spec: "1280x720" },
+  { id: "linkedin", label: "LinkedIn (1.91:1)", spec: "1200x627" },
+  { id: "bg-remove", label: "Remover fundo", spec: "PNG transparente" },
+  { id: "bg-replace", label: "Trocar fundo", spec: "manter sujeito" },
+  { id: "enhance", label: "Melhorar qualidade", spec: "nitidez + cores" },
+  { id: "free", label: "Edição livre", spec: "—" },
+];
+
+const editImageViaAI = async (
+  imageUrls: string[],
+  prompt: string,
+  preset: string
+): Promise<string> => {
+  const { data, error } = await supabase.functions.invoke("edit-image", {
+    body: { imageUrls, prompt, preset },
+  });
+  if (error) throw error;
+  if (!data?.url) throw new Error(data?.error || "Sem URL retornada");
+  return data.url as string;
+};
 
 const isAdmin = () => {
   if (typeof window === "undefined") return false;
@@ -156,67 +185,98 @@ const mountPopup = () => {
   headerBtns.appendChild(closeBtn);
   header.appendChild(headerBtns);
 
-  // Body
+  // ===== State =====
+  let activeTab: "text" | "image" = (() => {
+    try {
+      const v = window.localStorage.getItem(TAB_KEY);
+      return v === "image" ? "image" : "text";
+    } catch { return "text"; }
+  })();
+  const savedImgPrompt = (() => {
+    try { return window.localStorage.getItem(IMG_PROMPT_KEY) ?? ""; } catch { return ""; }
+  })();
+  const savedPreset = (() => {
+    try { return window.localStorage.getItem(PRESET_KEY) ?? "ig-post"; } catch { return "ig-post"; }
+  })();
+
+  // ===== Body container =====
   const body = document.createElement("div");
   Object.assign(body.style, {
-    padding: "8px",
-    flex: "1",
-    display: "flex",
-    flexDirection: "column",
-    gap: "8px",
-    minHeight: "0",
+    flex: "1", display: "flex", flexDirection: "column",
+    minHeight: "0", overflow: "hidden",
+  } as Partial<CSSStyleDeclaration>);
+
+  // ----- Tabs bar -----
+  const tabsBar = document.createElement("div");
+  Object.assign(tabsBar.style, {
+    display: "flex", borderBottom: "1px solid rgba(255,255,255,0.08)",
+    background: "rgba(0,0,0,0.2)",
+  } as Partial<CSSStyleDeclaration>);
+  const makeTab = (id: "text" | "image", label: string) => {
+    const t = document.createElement("button");
+    t.textContent = label;
+    Object.assign(t.style, {
+      flex: "1", padding: "8px", border: "none",
+      background: "transparent", color: "#fff", cursor: "pointer",
+      fontSize: "12px", fontWeight: "500",
+      borderBottom: "2px solid transparent",
+    } as Partial<CSSStyleDeclaration>);
+    t.addEventListener("click", () => {
+      activeTab = id;
+      try { window.localStorage.setItem(TAB_KEY, id); } catch {}
+      applyTab();
+    });
+    return t;
+  };
+  const tabText = makeTab("text", "📝 Texto");
+  const tabImage = makeTab("image", "🖼️ Imagens");
+  tabsBar.appendChild(tabText);
+  tabsBar.appendChild(tabImage);
+
+  // ----- Panels container -----
+  const panels = document.createElement("div");
+  Object.assign(panels.style, {
+    padding: "8px", flex: "1", display: "flex", flexDirection: "column",
+    gap: "8px", minHeight: "0", overflow: "auto",
+  } as Partial<CSSStyleDeclaration>);
+
+  // ===== Painel TEXTO =====
+  const textPanel = document.createElement("div");
+  Object.assign(textPanel.style, {
+    flex: "1", display: "flex", flexDirection: "column", gap: "8px", minHeight: "0",
   } as Partial<CSSStyleDeclaration>);
 
   const textarea = document.createElement("textarea");
   textarea.placeholder = "Digite a instrução de desenvolvimento... (Ctrl/Cmd + Enter para disparar)";
   textarea.value = savedText;
   Object.assign(textarea.style, {
-    flex: "1",
-    width: "100%",
-    resize: "none",
-    background: "rgba(0,0,0,0.4)",
-    color: "#fff",
-    border: "1px solid rgba(255,255,255,0.15)",
-    borderRadius: "4px",
-    padding: "6px 8px",
-    fontSize: "12px",
+    flex: "1", width: "100%", resize: "none",
+    background: "rgba(0,0,0,0.4)", color: "#fff",
+    border: "1px solid rgba(255,255,255,0.15)", borderRadius: "4px",
+    padding: "6px 8px", fontSize: "12px",
     fontFamily: "ui-monospace, SFMono-Regular, Menlo, monospace",
-    outline: "none",
+    outline: "none", boxSizing: "border-box",
   } as Partial<CSSStyleDeclaration>);
   textarea.addEventListener("input", () => {
-    try {
-      window.localStorage.setItem(TEXT_KEY, textarea.value);
-    } catch {
-      /* noop */
-    }
+    try { window.localStorage.setItem(TEXT_KEY, textarea.value); } catch {}
   });
 
-  const footer = document.createElement("div");
-  Object.assign(footer.style, {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: "8px",
+  const textFooter = document.createElement("div");
+  Object.assign(textFooter.style, {
+    display: "flex", alignItems: "center", justifyContent: "space-between", gap: "8px",
   } as Partial<CSSStyleDeclaration>);
 
   const hint = document.createElement("a");
-  hint.textContent = '⬇ Baixar extensão Chrome';
+  hint.textContent = "⬇ Baixar extensão Chrome";
   hint.href = "/lovable-debug-tool.zip";
-  hint.title = "Instala em qualquer projeto Lovable automaticamente";
   Object.assign(hint.style, {
-    fontSize: "10px",
-    opacity: "0.7",
-    color: "#fff",
-    textDecoration: "underline",
-    cursor: "pointer",
+    fontSize: "10px", opacity: "0.7", color: "#fff",
+    textDecoration: "underline", cursor: "pointer",
   } as Partial<CSSStyleDeclaration>);
   hint.addEventListener("click", (e) => {
     e.preventDefault();
     fetch("/lovable-debug-tool.zip")
-      .then((r) => {
-        if (!r.ok) throw new Error("Falha no download: " + r.status);
-        return r.blob();
-      })
+      .then((r) => { if (!r.ok) throw new Error("Falha: " + r.status); return r.blob(); })
       .then((blob) => {
         const a = document.createElement("a");
         a.href = URL.createObjectURL(blob);
@@ -227,26 +287,9 @@ const mountPopup = () => {
       .catch((err) => alert(err.message));
   });
 
-  const fireBtn = document.createElement("button");
-  fireBtn.textContent = "🐛 Gerar Erro";
-  Object.assign(fireBtn.style, {
-    padding: "6px 12px",
-    background: "hsl(0, 84%, 60%)",
-    color: "#fff",
-    border: "none",
-    borderRadius: "4px",
-    fontSize: "12px",
-    fontWeight: "500",
-    cursor: "pointer",
-  } as Partial<CSSStyleDeclaration>);
-
-  // Attachments UI
   const attachmentsBar = document.createElement("div");
   Object.assign(attachmentsBar.style, {
-    display: "flex",
-    flexWrap: "wrap",
-    gap: "4px",
-    fontSize: "10px",
+    display: "flex", flexWrap: "wrap", gap: "4px", fontSize: "10px",
   } as Partial<CSSStyleDeclaration>);
 
   const fileInput = document.createElement("input");
@@ -257,20 +300,14 @@ const mountPopup = () => {
 
   const attachBtn = document.createElement("button");
   attachBtn.textContent = "📎 Anexar";
-  attachBtn.title = "Anexar imagens ou ZIPs (max 25MB cada)";
   Object.assign(attachBtn.style, {
-    padding: "6px 10px",
-    background: "rgba(255,255,255,0.1)",
-    color: "#fff",
-    border: "1px solid rgba(255,255,255,0.2)",
-    borderRadius: "4px",
-    fontSize: "11px",
-    cursor: "pointer",
+    padding: "6px 10px", background: "rgba(255,255,255,0.1)",
+    color: "#fff", border: "1px solid rgba(255,255,255,0.2)",
+    borderRadius: "4px", fontSize: "11px", cursor: "pointer",
   } as Partial<CSSStyleDeclaration>);
   attachBtn.addEventListener("click", () => fileInput.click());
 
   const attachments: { name: string; url: string }[] = [];
-
   const renderAttachments = () => {
     attachmentsBar.innerHTML = "";
     attachments.forEach((att, idx) => {
@@ -278,15 +315,10 @@ const mountPopup = () => {
       chip.textContent = `📎 ${att.name} ✕`;
       chip.title = att.url;
       Object.assign(chip.style, {
-        padding: "2px 6px",
-        background: "rgba(255,255,255,0.1)",
-        borderRadius: "3px",
-        cursor: "pointer",
+        padding: "2px 6px", background: "rgba(255,255,255,0.1)",
+        borderRadius: "3px", cursor: "pointer",
       } as Partial<CSSStyleDeclaration>);
-      chip.addEventListener("click", () => {
-        attachments.splice(idx, 1);
-        renderAttachments();
-      });
+      chip.addEventListener("click", () => { attachments.splice(idx, 1); renderAttachments(); });
       attachmentsBar.appendChild(chip);
     });
   };
@@ -296,16 +328,11 @@ const mountPopup = () => {
     const files = Array.from(fileInput.files);
     fileInput.value = "";
     for (const f of files) {
-      if (f.size > MAX_FILE_MB * 1024 * 1024) {
-        alert(`Arquivo "${f.name}" excede ${MAX_FILE_MB}MB`);
-        continue;
-      }
+      if (f.size > MAX_FILE_MB * 1024 * 1024) { alert(`"${f.name}" excede ${MAX_FILE_MB}MB`); continue; }
       const chip = document.createElement("span");
       chip.textContent = `⏳ ${f.name}`;
       Object.assign(chip.style, {
-        padding: "2px 6px",
-        background: "rgba(255,200,0,0.2)",
-        borderRadius: "3px",
+        padding: "2px 6px", background: "rgba(255,200,0,0.2)", borderRadius: "3px",
       } as Partial<CSSStyleDeclaration>);
       attachmentsBar.appendChild(chip);
       try {
@@ -314,14 +341,20 @@ const mountPopup = () => {
         attachments.push({ name: f.name, url });
         renderAttachments();
       } catch (err: unknown) {
-        const msg = err instanceof Error ? err.message : "Falha no upload";
         chip.textContent = `❌ ${f.name}`;
-        chip.title = msg;
+        chip.title = err instanceof Error ? err.message : "Falha no upload";
         setTimeout(() => chip.remove(), 3000);
       }
     }
   });
 
+  const fireBtn = document.createElement("button");
+  fireBtn.textContent = "🐛 Gerar Erro";
+  Object.assign(fireBtn.style, {
+    padding: "6px 12px", background: "hsl(0, 84%, 60%)", color: "#fff",
+    border: "none", borderRadius: "4px", fontSize: "12px",
+    fontWeight: "500", cursor: "pointer",
+  } as Partial<CSSStyleDeclaration>);
   const fire = () => {
     const text = textarea.value.trim();
     if (!text && attachments.length === 0) return;
@@ -331,22 +364,243 @@ const mountPopup = () => {
     }
     window.dispatchEvent(new CustomEvent("lovable-debug-error", { detail: message }));
   };
-
   fireBtn.addEventListener("click", fire);
   textarea.addEventListener("keydown", (e) => {
-    if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
-      e.preventDefault();
-      fire();
-    }
+    if ((e.ctrlKey || e.metaKey) && e.key === "Enter") { e.preventDefault(); fire(); }
   });
 
-  footer.appendChild(attachBtn);
-  footer.appendChild(hint);
-  footer.appendChild(fireBtn);
-  body.appendChild(textarea);
-  body.appendChild(attachmentsBar);
-  body.appendChild(fileInput);
-  body.appendChild(footer);
+  textFooter.appendChild(attachBtn);
+  textFooter.appendChild(hint);
+  textFooter.appendChild(fireBtn);
+  textPanel.appendChild(textarea);
+  textPanel.appendChild(attachmentsBar);
+  textPanel.appendChild(fileInput);
+  textPanel.appendChild(textFooter);
+
+  // ===== Painel IMAGENS =====
+  const imagePanel = document.createElement("div");
+  Object.assign(imagePanel.style, {
+    flex: "1", display: "flex", flexDirection: "column", gap: "8px", minHeight: "0",
+  } as Partial<CSSStyleDeclaration>);
+
+  const presetLabel = document.createElement("label");
+  presetLabel.textContent = "Modelo / Preset";
+  presetLabel.style.cssText = "font-size:11px;opacity:0.8;";
+  const presetSelect = document.createElement("select");
+  Object.assign(presetSelect.style, {
+    background: "rgba(0,0,0,0.4)", color: "#fff",
+    border: "1px solid rgba(255,255,255,0.15)", borderRadius: "4px",
+    padding: "6px 8px", fontSize: "12px", outline: "none", width: "100%",
+    boxSizing: "border-box",
+  } as Partial<CSSStyleDeclaration>);
+  PRESETS.forEach((p) => {
+    const o = document.createElement("option");
+    o.value = p.id; o.textContent = `${p.label} — ${p.spec}`;
+    o.style.background = "#222";
+    if (p.id === savedPreset) o.selected = true;
+    presetSelect.appendChild(o);
+  });
+  presetSelect.addEventListener("change", () => {
+    try { window.localStorage.setItem(PRESET_KEY, presetSelect.value); } catch {}
+  });
+
+  const dropZone = document.createElement("div");
+  Object.assign(dropZone.style, {
+    border: "2px dashed rgba(255,255,255,0.2)", borderRadius: "6px",
+    padding: "12px", textAlign: "center", fontSize: "12px",
+    cursor: "pointer", color: "rgba(255,255,255,0.7)",
+  } as Partial<CSSStyleDeclaration>);
+  dropZone.textContent = "📎 Clique ou arraste imagens aqui";
+  const imgFileInput = document.createElement("input");
+  imgFileInput.type = "file"; imgFileInput.accept = "image/*"; imgFileInput.multiple = true;
+  imgFileInput.style.display = "none";
+  dropZone.addEventListener("click", () => imgFileInput.click());
+  ["dragenter", "dragover"].forEach((ev) =>
+    dropZone.addEventListener(ev, (e) => { e.preventDefault(); dropZone.style.borderColor = "hsl(280,70%,60%)"; })
+  );
+  ["dragleave", "drop"].forEach((ev) =>
+    dropZone.addEventListener(ev, (e) => { e.preventDefault(); dropZone.style.borderColor = "rgba(255,255,255,0.2)"; })
+  );
+
+  type ImgEntry = { name: string; url?: string; uploading?: boolean; error?: string; previewUrl: string };
+  const imageEntries: ImgEntry[] = [];
+  const thumbs = document.createElement("div");
+  Object.assign(thumbs.style, { display: "flex", flexWrap: "wrap", gap: "6px" } as Partial<CSSStyleDeclaration>);
+
+  const renderImageThumbs = () => {
+    thumbs.innerHTML = "";
+    imageEntries.forEach((img, idx) => {
+      const wrap = document.createElement("div");
+      wrap.style.cssText = "position:relative;width:64px;height:64px;border-radius:4px;overflow:hidden;border:1px solid rgba(255,255,255,0.15);";
+      const im = document.createElement("img");
+      im.src = img.previewUrl;
+      im.style.cssText = "width:100%;height:100%;object-fit:cover;";
+      wrap.appendChild(im);
+      if (img.uploading) {
+        const ov = document.createElement("div");
+        ov.textContent = "↑";
+        ov.style.cssText = "position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);font-size:18px;color:#fff;";
+        wrap.appendChild(ov);
+      } else if (img.url) {
+        const ok = document.createElement("div");
+        ok.textContent = "✓";
+        ok.style.cssText = "position:absolute;bottom:2px;left:2px;background:hsl(140,60%,45%);color:#fff;font-size:10px;width:14px;height:14px;display:flex;align-items:center;justify-content:center;border-radius:50%;";
+        wrap.appendChild(ok);
+      } else if (img.error) {
+        wrap.style.borderColor = "hsl(0,80%,55%)";
+        wrap.title = img.error;
+      }
+      const x = document.createElement("button");
+      x.textContent = "✕";
+      Object.assign(x.style, {
+        position: "absolute", top: "2px", right: "2px",
+        width: "16px", height: "16px", border: "none",
+        background: "rgba(0,0,0,0.7)", color: "#fff",
+        borderRadius: "50%", fontSize: "10px", cursor: "pointer",
+      } as Partial<CSSStyleDeclaration>);
+      x.addEventListener("click", () => { imageEntries.splice(idx, 1); renderImageThumbs(); });
+      wrap.appendChild(x);
+      thumbs.appendChild(wrap);
+    });
+  };
+
+  const handleImageFiles = async (files: File[]) => {
+    for (const f of files) {
+      if (!f.type.startsWith("image/")) continue;
+      if (f.size > MAX_FILE_MB * 1024 * 1024) { alert(`"${f.name}" excede ${MAX_FILE_MB}MB`); continue; }
+      const previewUrl = URL.createObjectURL(f);
+      const entry: ImgEntry = { name: f.name, previewUrl, uploading: true };
+      imageEntries.push(entry);
+      renderImageThumbs();
+      try {
+        entry.url = await uploadAttachment(f);
+      } catch (err) {
+        entry.error = err instanceof Error ? err.message : "Falha no upload";
+      } finally {
+        entry.uploading = false;
+        renderImageThumbs();
+      }
+    }
+  };
+  imgFileInput.addEventListener("change", () => {
+    handleImageFiles(Array.from(imgFileInput.files || []));
+    imgFileInput.value = "";
+  });
+  dropZone.addEventListener("drop", (e) => {
+    e.preventDefault();
+    dropZone.style.borderColor = "rgba(255,255,255,0.2)";
+    handleImageFiles(Array.from(e.dataTransfer?.files || []));
+  });
+
+  const imgPromptLabel = document.createElement("label");
+  imgPromptLabel.textContent = "Descrição da edição";
+  imgPromptLabel.style.cssText = "font-size:11px;opacity:0.8;";
+  const imgPrompt = document.createElement("textarea");
+  imgPrompt.placeholder = "Ex: trocar o fundo por uma praia ao pôr do sol, manter o produto centralizado...";
+  imgPrompt.value = savedImgPrompt;
+  Object.assign(imgPrompt.style, {
+    width: "100%", minHeight: "60px", resize: "vertical",
+    background: "rgba(0,0,0,0.4)", color: "#fff",
+    border: "1px solid rgba(255,255,255,0.15)", borderRadius: "4px",
+    padding: "6px 8px", fontSize: "12px", outline: "none", boxSizing: "border-box",
+    fontFamily: "system-ui, -apple-system, sans-serif",
+  } as Partial<CSSStyleDeclaration>);
+  imgPrompt.addEventListener("input", () => {
+    try { window.localStorage.setItem(IMG_PROMPT_KEY, imgPrompt.value); } catch {}
+  });
+
+  const resultBox = document.createElement("div");
+  Object.assign(resultBox.style, {
+    display: "none", flexDirection: "column", gap: "4px",
+    padding: "6px", background: "rgba(0,0,0,0.3)", borderRadius: "4px",
+  } as Partial<CSSStyleDeclaration>);
+  const resultImg = document.createElement("img");
+  resultImg.style.cssText = "max-width:100%;max-height:200px;object-fit:contain;border-radius:4px;";
+  const resultActions = document.createElement("div");
+  resultActions.style.cssText = "display:flex;gap:6px;font-size:11px;";
+  const downloadLink = document.createElement("a");
+  downloadLink.textContent = "⬇ Baixar";
+  downloadLink.style.cssText = "color:#fff;text-decoration:underline;cursor:pointer;";
+  downloadLink.target = "_blank";
+  const copyLink = document.createElement("button");
+  copyLink.textContent = "📋 Copiar URL";
+  Object.assign(copyLink.style, {
+    background: "transparent", color: "#fff", border: "1px solid rgba(255,255,255,0.2)",
+    borderRadius: "3px", padding: "2px 6px", cursor: "pointer", fontSize: "11px",
+  } as Partial<CSSStyleDeclaration>);
+  resultActions.appendChild(downloadLink);
+  resultActions.appendChild(copyLink);
+  resultBox.appendChild(resultImg);
+  resultBox.appendChild(resultActions);
+
+  const imgFooter = document.createElement("div");
+  imgFooter.style.cssText = "display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:auto;";
+  const imgStatus = document.createElement("span");
+  imgStatus.style.cssText = "font-size:10px;opacity:0.6;";
+  const editBtn = document.createElement("button");
+  editBtn.textContent = "🎨 Editar Imagem";
+  Object.assign(editBtn.style, {
+    padding: "6px 12px", background: "hsl(280, 70%, 55%)", color: "#fff",
+    border: "none", borderRadius: "4px", fontSize: "12px",
+    fontWeight: "500", cursor: "pointer",
+  } as Partial<CSSStyleDeclaration>);
+  editBtn.addEventListener("click", async () => {
+    const ready = imageEntries.filter((i) => i.url);
+    if (ready.length === 0) { alert("Anexe ao menos uma imagem (e aguarde o upload)."); return; }
+    if (imageEntries.some((i) => i.uploading)) { alert("Aguarde o upload terminar."); return; }
+    editBtn.disabled = true;
+    editBtn.textContent = "⏳ Gerando...";
+    imgStatus.textContent = "Chamando Lovable AI...";
+    try {
+      const url = await editImageViaAI(
+        ready.map((i) => i.url!),
+        imgPrompt.value.trim(),
+        presetSelect.value,
+      );
+      resultImg.src = url;
+      downloadLink.href = url;
+      copyLink.onclick = () => { navigator.clipboard.writeText(url); copyLink.textContent = "✓ Copiado"; setTimeout(() => (copyLink.textContent = "📋 Copiar URL"), 1500); };
+      resultBox.style.display = "flex";
+      imgStatus.textContent = "✓ Pronto";
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Falha";
+      imgStatus.textContent = "❌ " + msg.slice(0, 60);
+      alert("Erro: " + msg);
+    } finally {
+      editBtn.disabled = false;
+      editBtn.textContent = "🎨 Editar Imagem";
+    }
+  });
+  imgFooter.appendChild(imgStatus);
+  imgFooter.appendChild(editBtn);
+
+  imagePanel.appendChild(presetLabel);
+  imagePanel.appendChild(presetSelect);
+  imagePanel.appendChild(dropZone);
+  imagePanel.appendChild(imgFileInput);
+  imagePanel.appendChild(thumbs);
+  imagePanel.appendChild(imgPromptLabel);
+  imagePanel.appendChild(imgPrompt);
+  imagePanel.appendChild(resultBox);
+  imagePanel.appendChild(imgFooter);
+
+  // ===== Mount panels into body =====
+  panels.appendChild(textPanel);
+  panels.appendChild(imagePanel);
+  body.appendChild(tabsBar);
+  body.appendChild(panels);
+
+  function applyTab() {
+    textPanel.style.display = activeTab === "text" ? "flex" : "none";
+    imagePanel.style.display = activeTab === "image" ? "flex" : "none";
+    [tabText, tabImage].forEach((t, i) => {
+      const isActive = (i === 0 ? "text" : "image") === activeTab;
+      t.style.borderBottomColor = isActive ? "hsl(0, 84%, 60%)" : "transparent";
+      t.style.opacity = isActive ? "1" : "0.6";
+    });
+  }
+  applyTab();
+
 
   // Resize handle
   const resizer = document.createElement("div");
