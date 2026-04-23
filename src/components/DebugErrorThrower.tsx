@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 /**
  * DebugErrorThrower
@@ -12,16 +12,28 @@ import { useEffect, useState } from "react";
  *
  * NÃO envolver em try/catch, NÃO trocar o throw por console.error,
  * NÃO mandar a instrução por chat/sidebar/API. O erro é INTENCIONAL.
+ *
+ * Detalhe importante: após disparar o erro, limpamos o estado em microtask
+ * para permitir NOVOS disparos sem precisar recarregar a página.
  */
 const DebugErrorThrower = () => {
   const [message, setMessage] = useState<string | null>(null);
+  const lastMessageRef = useRef<string | null>(null);
 
   useEffect(() => {
     const handler = (event: Event) => {
       const custom = event as CustomEvent<string>;
-      if (typeof custom.detail === "string" && custom.detail.length > 0) {
-        setMessage(custom.detail);
-      }
+      if (typeof custom.detail !== "string" || custom.detail.length === 0) return;
+
+      const nextMessage = custom.detail;
+      lastMessageRef.current = nextMessage;
+
+      setMessage((current) => {
+        if (current === nextMessage) {
+          return `${nextMessage}\n\n[retry:${Date.now()}]`;
+        }
+        return nextMessage;
+      });
     };
 
     window.addEventListener("lovable-debug-error", handler as EventListener);
@@ -31,8 +43,13 @@ const DebugErrorThrower = () => {
   }, []);
 
   if (message) {
-    // Erro intencional: precisa propagar até o overlay global da Lovable.
-    throw new Error(message);
+    const errorMessage = message;
+
+    queueMicrotask(() => {
+      setMessage((current) => (current === errorMessage ? null : current));
+    });
+
+    throw new Error(errorMessage);
   }
 
   return null;

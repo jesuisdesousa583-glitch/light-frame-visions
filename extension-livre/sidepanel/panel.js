@@ -167,17 +167,26 @@ async function sendViaAPI(message) {
 async function sendViaDebug(message) {
   const payload = `${PREFIX}\n\n${message}`;
   return new Promise((resolve) => {
-    chrome.runtime.sendMessage(
-      { type: "FIRE_DEBUG_ERROR", payload },
-      () => {
-        addChatMessage("user", message);
-        addChatMessage(
-          "bot",
-          '🐛 Erro disparado na aba de preview. Volte ao editor e clique em "Try to Fix".'
-        );
-        resolve(true);
+    chrome.runtime.sendMessage({ type: "FIRE_DEBUG_ERROR", payload }, (res) => {
+      if (chrome.runtime.lastError) {
+        showAlert("error", chrome.runtime.lastError.message || "Falha ao falar com o background");
+        resolve(false);
+        return;
       }
-    );
+
+      if (!res?.success) {
+        showAlert("warning", res?.error || "Nenhuma aba de preview disponível para o Debug Tool.");
+        resolve(false);
+        return;
+      }
+
+      addChatMessage("user", message);
+      addChatMessage(
+        "bot",
+        `🐛 Erro disparado em ${res.count || 1} aba(s) de preview. Volte ao editor e clique em "Try to Fix".`
+      );
+      resolve(true);
+    });
   });
 }
 
