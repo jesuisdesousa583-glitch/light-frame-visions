@@ -1,53 +1,29 @@
 {
   "manifest_version": 3,
   "name": "Lovable Free Tools",
-  "version": "1.0.0",
-  "description": "Painel lateral livre para enviar mensagens ao Lovable. Sem chave de acesso. Com modo Debug Tool (Try to Fix) para economizar créditos.",
-  "permissions": [
-    "sidePanel",
-    "storage",
-    "tabs",
-    "webRequest",
-    "activeTab",
-    "scripting"
-  ],
+  "version": "1.1.0",
+  "description": "Detecta projetos Lovable automaticamente e injeta o Debug Tool flutuante para disparar instruções via 'Try to Fix' sem usar o chat lateral.",
+  "permissions": ["storage", "activeTab", "scripting"],
   "host_permissions": [
-    "https://lovable.dev/*",
-    "https://api.lovable.dev/*",
     "https://*.lovable.app/*",
-    "https://*.lovableproject.com/*"
+    "https://*.lovableproject.com/*",
+    "https://lovable.dev/*"
   ],
-  "background": {
-    "service_worker": "background.js",
-    "type": "module"
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Lovable Free Tools"
   },
   "content_scripts": [
-    {
-      "matches": ["https://lovable.dev/*"],
-      "js": ["content-editor.js"],
-      "run_at": "document_idle"
-    },
     {
       "matches": [
         "https://*.lovable.app/*",
         "https://*.lovableproject.com/*"
       ],
-      "js": ["content-preview.js"],
-      "run_at": "document_idle"
+      "js": ["content.js"],
+      "run_at": "document_idle",
+      "all_frames": false
     }
   ],
-  "side_panel": {
-    "default_path": "sidepanel/index.html"
-  },
-  "action": {
-    "default_title": "Lovable Free Tools",
-    "default_icon": {
-      "16": "icons/icon16.png",
-      "32": "icons/icon32.png",
-      "48": "icons/icon48.png",
-      "128": "icons/icon128.png"
-    }
-  },
   "icons": {
     "16": "icons/icon16.png",
     "32": "icons/icon32.png",
