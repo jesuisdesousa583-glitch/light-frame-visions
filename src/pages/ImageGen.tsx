@@ -175,12 +175,14 @@ export default function ImageGen() {
   const baseFileRef = useRef<HTMLInputElement>(null);
   const refFileRef = useRef<HTMLInputElement>(null);
   const [baseImg, setBaseImg] = useState<string | null>(null);
-  const [refImg, setRefImg] = useState<string | null>(null);
+  const [refImgs, setRefImgs] = useState<string[]>([]);
   const [combinePrompt, setCombinePrompt] = useState("");
   const [combinedUrl, setCombinedUrl] = useState<string | null>(null);
   const [combining, setCombining] = useState(false);
   const [variants, setVariants] = useState<Record<SocialFormat["key"], string> | null>(null);
   const [activeVariant, setActiveVariant] = useState<SocialFormat["key"]>("reels");
+
+  const MAX_REFS = 4;
 
   const readFileToDataUrl = (file: File, set: (s: string) => void) => {
     if (file.size > 8 * 1024 * 1024) {
@@ -193,16 +195,33 @@ export default function ImageGen() {
     reader.readAsDataURL(file);
   };
 
+  const addRefImages = (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    const remaining = MAX_REFS - refImgs.length;
+    if (remaining <= 0) {
+      toast.error(`Máximo de ${MAX_REFS} imagens de referência`);
+      return;
+    }
+    const toRead = Array.from(files).slice(0, remaining);
+    toRead.forEach((f) => {
+      readFileToDataUrl(f, (url) => setRefImgs((prev) => [...prev, url]));
+    });
+  };
+
+  const removeRefImage = (idx: number) => {
+    setRefImgs((prev) => prev.filter((_, i) => i !== idx));
+  };
+
   const handleCombine = async () => {
     if (!baseImg) return toast.error("Envie a foto base (do criativo)");
-    if (!refImg) return toast.error("Envie a foto de referência");
+    if (refImgs.length === 0) return toast.error("Envie ao menos 1 foto de referência");
     if (!combinePrompt.trim()) return toast.error("Descreva como combinar");
     setCombining(true);
     setCombinedUrl(null);
     setVariants(null);
     try {
       const { data, error } = await supabase.functions.invoke("image-combine", {
-        body: { baseImage: baseImg, referenceImage: refImg, prompt: combinePrompt },
+        body: { baseImage: baseImg, referenceImages: refImgs, prompt: combinePrompt },
       });
       if (error) throw error;
       if (!data?.imageUrl) throw new Error(data?.error || "Sem imagem na resposta");
