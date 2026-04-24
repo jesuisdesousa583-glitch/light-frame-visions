@@ -57,7 +57,21 @@ Deno.serve(async (req) => {
       );
     }
 
-    const fullPrompt = `IMAGE 1 is the base subject (preserve identity, face, pose). IMAGE 2 is the reference for style/background/element. Instruction: ${prompt}`;
+    const refsDescription = referenceImages
+      .map((_, i) => `IMAGE ${i + 2}`)
+      .join(", ");
+    const fullPrompt = `IMAGE 1 is the base subject (preserve identity, face, pose). ${refsDescription} ${
+      referenceImages.length > 1 ? "are references" : "is the reference"
+    } for style/background/elements (combine them as instructed). Instruction: ${prompt}`;
+
+    const content: Array<Record<string, unknown>> = [
+      { type: "text", text: fullPrompt },
+      { type: "image_url", image_url: { url: baseImage } },
+      ...referenceImages.map((url) => ({
+        type: "image_url",
+        image_url: { url },
+      })),
+    ];
 
     const resp = await fetch(
       "https://ai.gateway.lovable.dev/v1/chat/completions",
@@ -69,16 +83,7 @@ Deno.serve(async (req) => {
         },
         body: JSON.stringify({
           model: "google/gemini-2.5-flash-image",
-          messages: [
-            {
-              role: "user",
-              content: [
-                { type: "text", text: fullPrompt },
-                { type: "image_url", image_url: { url: baseImage } },
-                { type: "image_url", image_url: { url: referenceImage } },
-              ],
-            },
-          ],
+          messages: [{ role: "user", content }],
           modalities: ["image", "text"],
         }),
       },
