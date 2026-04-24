@@ -229,7 +229,15 @@ export default function ImageGen() {
       // Gera os 4 formatos a partir da MESMA imagem (sem créditos extras)
       const v = await cropToAllFormats(data.imageUrl);
       setVariants(v);
-      toast.success("Imagem gerada nos 4 formatos!");
+      if (data.fallback) {
+        toast.warning(
+          data.fallbackReason ||
+            "Geração grátis usada (sem suas fotos como referência visual).",
+          { duration: 6000 },
+        );
+      } else {
+        toast.success("Imagem gerada nos 4 formatos!");
+      }
     } catch (e: any) {
       toast.error(e?.message || "Falha ao combinar");
     } finally {

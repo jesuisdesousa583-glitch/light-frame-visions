@@ -89,25 +89,57 @@ Deno.serve(async (req) => {
       },
     );
 
-    if (!resp.ok) {
-      if (resp.status === 429) {
+    // Helper: fallback 100% grátis via Pollinations (text-to-image).
+    // Não usa as imagens como referência visual (limitação do tier grátis),
+    // mas mantém o fluxo funcional sem consumir créditos.
+    const pollinationsFallback = async (reason: string) => {
+      try {
+        const seed = Math.floor(Math.random() * 1_000_000);
+        const enriched = `${prompt}. Professional photo composition, sharp focus, cinematic lighting, ultra realistic, 4k, social media post`;
+        const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(
+          enriched,
+        )}?width=1024&height=1024&model=flux-realism&seed=${seed}&nologo=true`;
+        const imgRes = await fetch(url);
+        if (!imgRes.ok) throw new Error(`Pollinations ${imgRes.status}`);
+        const buf = new Uint8Array(await imgRes.arrayBuffer());
+        // Converte para data URL para o client renderizar offline
+        let binary = "";
+        const chunk = 0x8000;
+        for (let i = 0; i < buf.length; i += chunk) {
+          binary += String.fromCharCode(...buf.subarray(i, i + chunk));
+        }
+        const dataUrl = `data:image/jpeg;base64,${btoa(binary)}`;
         return new Response(
-          JSON.stringify({ error: "Limite atingido. Tente novamente em instantes." }),
-          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+          JSON.stringify({
+            imageUrl: dataUrl,
+            fallback: true,
+            fallbackReason: reason,
+          }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        );
+      } catch (err) {
+        console.error("Pollinations fallback failed:", err);
+        return new Response(
+          JSON.stringify({
+            error:
+              "Sem créditos do Lovable AI e fallback grátis (Pollinations) também falhou. Tente novamente.",
+          }),
+          { status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" } },
         );
       }
-      if (resp.status === 402) {
-        return new Response(
-          JSON.stringify({ error: "Créditos Lovable AI esgotados. Adicione saldo em Settings → Cloud & AI balance." }),
-          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-        );
+    };
+
+    if (!resp.ok) {
+      if (resp.status === 402 || resp.status === 429) {
+        const reason =
+          resp.status === 402
+            ? "Créditos Lovable AI esgotados — usando geração grátis (sem usar suas fotos como referência visual)."
+            : "Limite de uso temporário — usando geração grátis.";
+        return await pollinationsFallback(reason);
       }
       const t = await resp.text();
       console.error("Gateway error", resp.status, t);
-      return new Response(
-        JSON.stringify({ error: "Erro no gateway" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-      );
+      return await pollinationsFallback(`Erro no gateway (${resp.status}) — usando fallback grátis.`);
     }
 
     const data = await resp.json();
@@ -116,14 +148,11 @@ Deno.serve(async (req) => {
 
     if (!url) {
       console.error("Sem imagem:", JSON.stringify(data).slice(0, 500));
-      return new Response(
-        JSON.stringify({ error: "Modelo não retornou imagem" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-      );
+      return await pollinationsFallback("Modelo não retornou imagem — usando fallback grátis.");
     }
 
     return new Response(
-      JSON.stringify({ imageUrl: url }),
+      JSON.stringify({ imageUrl: url, fallback: false }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   } catch (e) {
