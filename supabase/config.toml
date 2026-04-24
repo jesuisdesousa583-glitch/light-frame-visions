@@ -1,1 +1,10 @@
 project_id = "ajwelsrtjunkbzqlxtkb"
+
+[functions.image-edit]
+verify_jwt = false
+
+[functions.image-edit-hf]
+verify_jwt = false
+
+[functions.image-combine]
+verify_jwt = false
