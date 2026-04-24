@@ -15,7 +15,14 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { baseImage, referenceImage, prompt } = await req.json();
+    const body = await req.json();
+    const { baseImage, prompt } = body;
+    // Aceita `referenceImages` (array) OU `referenceImage` (string, legado)
+    const refsRaw: unknown =
+      body.referenceImages ?? (body.referenceImage ? [body.referenceImage] : []);
+    const referenceImages: string[] = Array.isArray(refsRaw)
+      ? refsRaw.filter((s) => typeof s === "string" && s.length > 0)
+      : [];
 
     if (!baseImage || typeof baseImage !== "string") {
       return new Response(
@@ -23,9 +30,15 @@ Deno.serve(async (req) => {
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
-    if (!referenceImage || typeof referenceImage !== "string") {
+    if (referenceImages.length === 0) {
       return new Response(
-        JSON.stringify({ error: "referenceImage é obrigatória" }),
+        JSON.stringify({ error: "Pelo menos 1 imagem de referência é obrigatória" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
+    if (referenceImages.length > 4) {
+      return new Response(
+        JSON.stringify({ error: "Máximo de 4 imagens de referência" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
@@ -44,7 +57,21 @@ Deno.serve(async (req) => {
       );
     }
 
-    const fullPrompt = `IMAGE 1 is the base subject (preserve identity, face, pose). IMAGE 2 is the reference for style/background/element. Instruction: ${prompt}`;
+    const refsDescription = referenceImages
+      .map((_, i) => `IMAGE ${i + 2}`)
+      .join(", ");
+    const fullPrompt = `IMAGE 1 is the base subject (preserve identity, face, pose). ${refsDescription} ${
+      referenceImages.length > 1 ? "are references" : "is the reference"
+    } for style/background/elements (combine them as instructed). Instruction: ${prompt}`;
+
+    const content: Array<Record<string, unknown>> = [
+      { type: "text", text: fullPrompt },
+      { type: "image_url", image_url: { url: baseImage } },
+      ...referenceImages.map((url) => ({
+        type: "image_url",
+        image_url: { url },
+      })),
+    ];
 
     const resp = await fetch(
       "https://ai.gateway.lovable.dev/v1/chat/completions",
@@ -56,16 +83,7 @@ Deno.serve(async (req) => {
         },
         body: JSON.stringify({
           model: "google/gemini-2.5-flash-image",
-          messages: [
-            {
-              role: "user",
-              content: [
-                { type: "text", text: fullPrompt },
-                { type: "image_url", image_url: { url: baseImage } },
-                { type: "image_url", image_url: { url: referenceImage } },
-              ],
-            },
-          ],
+          messages: [{ role: "user", content }],
           modalities: ["image", "text"],
         }),
       },
