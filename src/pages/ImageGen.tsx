@@ -547,67 +547,101 @@ export default function ImageGen() {
 
               <div className="grid gap-6 md:grid-cols-[1fr_1.2fr]">
                 <Card className="space-y-4 p-5">
-                  <div className="grid grid-cols-2 gap-3">
-                    <div className="space-y-2">
-                      <Label>Foto base (criativo)</Label>
-                      <input
-                        ref={baseFileRef}
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={(e) => {
-                          const f = e.target.files?.[0];
-                          if (f) readFileToDataUrl(f, setBaseImg);
-                        }}
+                  <div className="space-y-2">
+                    <Label>Foto base (criativo)</Label>
+                    <input
+                      ref={baseFileRef}
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={(e) => {
+                        const f = e.target.files?.[0];
+                        if (f) readFileToDataUrl(f, setBaseImg);
+                      }}
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => baseFileRef.current?.click()}
+                      className="w-full"
+                      size="sm"
+                    >
+                      <Upload className="mr-2 h-4 w-4" />
+                      {baseImg ? "Trocar foto base" : "Enviar foto base"}
+                    </Button>
+                    {baseImg && (
+                      <img
+                        src={baseImg}
+                        alt="base"
+                        className="mt-1 h-28 w-full rounded-md object-cover"
                       />
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={() => baseFileRef.current?.click()}
-                        className="w-full"
-                        size="sm"
-                      >
-                        <Upload className="mr-2 h-4 w-4" />
-                        {baseImg ? "Trocar" : "Enviar"}
-                      </Button>
-                      {baseImg && (
-                        <img
-                          src={baseImg}
-                          alt="base"
-                          className="mt-1 h-28 w-full rounded-md object-cover"
-                        />
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <Label>Fotos de referência ({refImgs.length}/{MAX_REFS})</Label>
+                      {refImgs.length > 0 && (
+                        <button
+                          type="button"
+                          onClick={() => setRefImgs([])}
+                          className="text-xs text-muted-foreground hover:text-foreground"
+                        >
+                          Limpar
+                        </button>
                       )}
                     </div>
-                    <div className="space-y-2">
-                      <Label>Foto de referência</Label>
-                      <input
-                        ref={refFileRef}
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={(e) => {
-                          const f = e.target.files?.[0];
-                          if (f) readFileToDataUrl(f, setRefImg);
-                        }}
-                      />
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={() => refFileRef.current?.click()}
-                        className="w-full"
-                        size="sm"
-                      >
-                        <Upload className="mr-2 h-4 w-4" />
-                        {refImg ? "Trocar" : "Enviar"}
-                      </Button>
-                      {refImg && (
-                        <img
-                          src={refImg}
-                          alt="ref"
-                          className="mt-1 h-28 w-full rounded-md object-cover"
-                        />
-                      )}
-                    </div>
+                    <input
+                      ref={refFileRef}
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      className="hidden"
+                      onChange={(e) => {
+                        addRefImages(e.target.files);
+                        // permite re-selecionar o mesmo arquivo
+                        if (e.target) e.target.value = "";
+                      }}
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => refFileRef.current?.click()}
+                      className="w-full"
+                      size="sm"
+                      disabled={refImgs.length >= MAX_REFS}
+                    >
+                      <Upload className="mr-2 h-4 w-4" />
+                      {refImgs.length === 0
+                        ? "Enviar referências (até 4)"
+                        : refImgs.length >= MAX_REFS
+                          ? "Limite atingido"
+                          : "Adicionar mais referências"}
+                    </Button>
+                    {refImgs.length > 0 && (
+                      <div className="mt-2 grid grid-cols-4 gap-2">
+                        {refImgs.map((src, i) => (
+                          <div key={i} className="group relative">
+                            <img
+                              src={src}
+                              alt={`ref ${i + 1}`}
+                              className="h-20 w-full rounded-md border border-border object-cover"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => removeRefImage(i)}
+                              className="absolute right-1 top-1 rounded-full bg-background/90 px-1.5 text-xs text-foreground shadow opacity-0 transition group-hover:opacity-100"
+                              aria-label="Remover"
+                            >
+                              ✕
+                            </button>
+                            <span className="absolute bottom-1 left-1 rounded bg-background/80 px-1 text-[10px] text-muted-foreground">
+                              #{i + 2}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
 
                   <div className="space-y-2">
@@ -616,14 +650,14 @@ export default function ImageGen() {
                       id="combine-prompt"
                       value={combinePrompt}
                       onChange={(e) => setCombinePrompt(e.target.value)}
-                      placeholder="Ex.: mantenha o rosto/pessoa da Imagem 1 e use o estilo/fundo da Imagem 2"
+                      placeholder="Ex.: mantenha o rosto da Imagem 1, use o fundo da Imagem 2 e o estilo da Imagem 3"
                       className="min-h-[120px]"
                     />
                   </div>
 
                   <Button
                     onClick={handleCombine}
-                    disabled={combining || !baseImg || !refImg}
+                    disabled={combining || !baseImg || refImgs.length === 0}
                     className="w-full"
                     size="lg"
                   >
