@@ -135,8 +135,22 @@ Não criar montagem artificial. A fusão deve parecer uma única foto original.`
       return { mimeType, data: btoa(binary) };
     };
 
+    if (!GEMINI_API_KEY) {
+      return new Response(
+        JSON.stringify({
+          error: "GEMINI_API_KEY não configurada no backend.",
+          provider: "gemini-direct",
+        }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
+
     // PRIMARY PATH: Direct Google Gemini API (uses user's GEMINI_API_KEY, no Lovable credits)
-    if (GEMINI_API_KEY) {
+    const directModels = ["gemini-2.5-flash-image", "gemini-2.5-flash-image-preview"];
+    let lastGeminiStatus = 502;
+    let lastGeminiError = "Gemini direto não retornou imagem.";
+
+    for (const model of directModels) {
       try {
         const allImages = [baseImage, ...referenceImages];
         const inlineParts = await Promise.all(
@@ -152,9 +166,14 @@ Não criar montagem artificial. A fusão deve parecer uma única foto original.`
               parts: [{ text: fullPrompt }, ...inlineParts],
             },
           ],
+          generationConfig: {
+            responseModalities: ["TEXT", "IMAGE"],
+            maxOutputTokens: 8192,
+            temperature: 0.7,
+          },
         };
         const gResp = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent?key=${GEMINI_API_KEY}`,
+          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -189,19 +208,33 @@ Não criar montagem artificial. A fusão deve parecer uma única foto original.`
               { headers: { ...corsHeaders, "Content-Type": "application/json" } },
             );
           }
-          console.error("Gemini direct: no image in response");
+          lastGeminiError = `${model}: resposta sem imagem`;
+          console.error("Gemini direct: no image in response", model);
         } else {
           const t = await gResp.text();
-          console.error("Gemini direct error", gResp.status, t.slice(0, 300));
+          lastGeminiStatus = gResp.status;
+          lastGeminiError = `${model}: ${t.slice(0, 500)}`;
+          console.error("Gemini direct error", model, gResp.status, t.slice(0, 300));
         }
       } catch (err) {
-        console.error("Gemini direct exception:", err);
+        lastGeminiError = err instanceof Error ? err.message : "Erro desconhecido no Gemini direto";
+        console.error("Gemini direct exception:", model, err);
       }
-      return await freeImageFallback("Gemini direto não retornou imagem — usando geração grátis sem créditos Lovable.");
     }
 
-    return await freeImageFallback(
-      "GEMINI_API_KEY não configurada ou Gemini indisponível — usando fallback grátis sem créditos Lovable.",
+    return new Response(
+      JSON.stringify({
+        error:
+          lastGeminiStatus === 429
+            ? "A chave Gemini está configurada, mas está sem quota para geração/edição de imagem. Nenhum crédito Lovable foi usado."
+            : "Gemini direto não conseguiu gerar a imagem. Nenhum crédito Lovable foi usado.",
+        provider: "gemini-direct",
+        details: lastGeminiError,
+      }),
+      {
+        status: lastGeminiStatus === 429 ? 429 : 502,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      },
     );
   } catch (e) {
     console.error("image-combine error:", e);
