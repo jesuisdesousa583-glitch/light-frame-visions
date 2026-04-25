@@ -128,63 +128,75 @@ Deno.serve(async (req) => {
         }),
       );
 
-      const gResp = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent?key=${GEMINI_API_KEY}`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            contents: [
-              {
-                role: "user",
-                parts: [{ text: fullPrompt }, ...inlineParts],
+      const directModels = [
+        "gemini-2.5-flash-image-preview",
+        "gemini-2.0-flash-preview-image-generation",
+        "gemini-2.5-flash-image",
+      ];
+
+      let lastGeminiError = "";
+      for (const model of directModels) {
+        const gResp = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              contents: [
+                {
+                  role: "user",
+                  parts: [{ text: fullPrompt }, ...inlineParts],
+                },
+              ],
+              generationConfig: {
+                responseModalities: ["TEXT", "IMAGE"],
               },
-            ],
-            generationConfig: {
-              responseModalities: ["TEXT", "IMAGE"],
-            },
+            }),
+          },
+        );
+
+        if (!gResp.ok) {
+          const t = await gResp.text();
+          lastGeminiError = `${model}: ${gResp.status}`;
+          console.error("Gemini direct error", model, gResp.status, t.slice(0, 500));
+          continue;
+        }
+
+        const gData = await gResp.json();
+        const parts = gData?.candidates?.[0]?.content?.parts ?? [];
+        const imgPart = parts.find(
+          (p: Record<string, unknown>) =>
+            (p as { inline_data?: unknown }).inline_data ||
+            (p as { inlineData?: unknown }).inlineData,
+        );
+        const inline =
+          (imgPart as { inline_data?: { mime_type?: string; data?: string } })?.inline_data ??
+          (imgPart as { inlineData?: { mimeType?: string; data?: string } })?.inlineData;
+
+        if (!inline?.data) {
+          lastGeminiError = `${model}: sem imagem`;
+          console.error("Gemini direct: no image in response", model, JSON.stringify(gData).slice(0, 500));
+          continue;
+        }
+
+        const mimeType =
+          (inline as { mime_type?: string; mimeType?: string }).mime_type ??
+          (inline as { mimeType?: string }).mimeType ??
+          "image/png";
+
+        return new Response(
+          JSON.stringify({
+            imageUrl: `data:${mimeType};base64,${inline.data}`,
+            fallback: false,
+            provider: "gemini-direct",
+            model,
           }),
-        },
-      );
-
-      if (!gResp.ok) {
-        const t = await gResp.text();
-        console.error("Gemini direct error", gResp.status, t.slice(0, 500));
-        return await freeImageFallback(
-          `Gemini direto retornou erro ${gResp.status} — usando geração grátis sem créditos Lovable.`,
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } },
         );
       }
 
-      const gData = await gResp.json();
-      const parts = gData?.candidates?.[0]?.content?.parts ?? [];
-      const imgPart = parts.find(
-        (p: Record<string, unknown>) =>
-          (p as { inline_data?: unknown }).inline_data ||
-          (p as { inlineData?: unknown }).inlineData,
-      );
-      const inline =
-        (imgPart as { inline_data?: { mime_type?: string; data?: string } })?.inline_data ??
-        (imgPart as { inlineData?: { mimeType?: string; data?: string } })?.inlineData;
-
-      if (!inline?.data) {
-        console.error("Gemini direct: no image in response", JSON.stringify(gData).slice(0, 500));
-        return await freeImageFallback(
-          "Gemini direto respondeu sem imagem — usando geração grátis sem créditos Lovable.",
-        );
-      }
-
-      const mimeType =
-        (inline as { mime_type?: string; mimeType?: string }).mime_type ??
-        (inline as { mimeType?: string }).mimeType ??
-        "image/png";
-
-      return new Response(
-        JSON.stringify({
-          imageUrl: `data:${mimeType};base64,${inline.data}`,
-          fallback: false,
-          provider: "gemini-direct",
-        }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      return await freeImageFallback(
+        `Gemini direto indisponível (${lastGeminiError || "sem resposta"}) — usando geração grátis sem créditos Lovable.`,
       );
     } catch (err) {
       console.error("Gemini direct exception:", err);
