@@ -171,7 +171,7 @@ export default function ImageGen() {
     }
   };
 
-  // -------- Modo "Combinar 2 imagens" (Nano Banana via Lovable AI — pago) --------
+  // -------- Modo "Combinar 2 imagens" (Gemini direto no backend — sem créditos Lovable) --------
   const baseFileRef = useRef<HTMLInputElement>(null);
   const refFileRef = useRef<HTMLInputElement>(null);
   const [baseImg, setBaseImg] = useState<string | null>(null);
@@ -215,7 +215,6 @@ export default function ImageGen() {
   const handleCombine = async () => {
     if (!baseImg) return toast.error("Envie a foto base (do criativo)");
     if (refImgs.length === 0) return toast.error("Envie ao menos 1 foto de referência");
-    if (!combinePrompt.trim()) return toast.error("Descreva como combinar");
     setCombining(true);
     setCombinedUrl(null);
     setVariants(null);
@@ -223,7 +222,7 @@ export default function ImageGen() {
       const { data, error } = await supabase.functions.invoke("image-combine", {
         body: { baseImage: baseImg, referenceImages: refImgs, prompt: combinePrompt },
       });
-      if (error) throw error;
+      if (error) throw new Error(data?.error || error.message || "Falha ao combinar");
       if (!data?.imageUrl) throw new Error(data?.error || "Sem imagem na resposta");
       setCombinedUrl(data.imageUrl);
       // Gera os 4 formatos a partir da MESMA imagem (sem créditos extras)
@@ -544,12 +543,12 @@ export default function ImageGen() {
 
             {/* -------- ABA COMBINAR 2 IMAGENS -------- */}
             <TabsContent value="combine" className="mt-6">
-              <div className="mb-4 flex items-start gap-2 rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm text-muted-foreground">
-                <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-destructive" />
+              <div className="mb-4 flex items-start gap-2 rounded-md border border-border bg-muted/40 p-3 text-sm text-muted-foreground">
+                <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
                 <p>
-                  Modo <strong>Combinar 2 imagens</strong> usa o Nano Banana (Gemini Flash Image)
-                  via Lovable AI — único modelo que aceita 2 imagens.{" "}
-                  <strong>Consome créditos do Lovable AI</strong> ($1 grátis/mês, depois pré-pago).
+                  Modo <strong>Combinar 2 imagens</strong> usa a chave Gemini configurada no backend
+                  para criar um criativo jurídico premium com rosto da imagem 2, estética da imagem 1
+                  e texto publicitário. <strong>Não consome créditos Lovable.</strong>
                 </p>
               </div>
 
@@ -653,12 +652,12 @@ export default function ImageGen() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="combine-prompt">Como combinar</Label>
+                    <Label htmlFor="combine-prompt">Texto ou ajuste opcional do criativo</Label>
                     <Textarea
                       id="combine-prompt"
                       value={combinePrompt}
                       onChange={(e) => setCombinePrompt(e.target.value)}
-                      placeholder="Ex.: mantenha o rosto da Imagem 1, use o fundo da Imagem 2 e o estilo da Imagem 3"
+                      placeholder="Ex.: Banner: STJ DECIDE. Headline: IMÓVEL COMPRADO ANTES DO CASAMENTO PODE SER DIVIDIDO. CTA: Confira na legenda"
                       className="min-h-[120px]"
                     />
                   </div>

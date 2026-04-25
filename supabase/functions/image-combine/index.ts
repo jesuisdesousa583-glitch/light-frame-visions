@@ -15,7 +15,11 @@ Deno.serve(async (req) => {
 
   try {
     const body = await req.json();
-    const { baseImage, prompt } = body;
+    const { baseImage } = body;
+    const userPrompt =
+      typeof body.prompt === "string" && body.prompt.trim().length > 0
+        ? body.prompt.trim()
+        : "Use o texto padrão do criativo jurídico, mantendo o resultado premium, realista e pronto para redes sociais.";
     // Aceita `referenceImages` (array) OU `referenceImage` (string, legado)
     const refsRaw: unknown =
       body.referenceImages ?? (body.referenceImage ? [body.referenceImage] : []);
@@ -41,66 +45,72 @@ Deno.serve(async (req) => {
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
-    if (!prompt || typeof prompt !== "string") {
-      return new Response(
-        JSON.stringify({ error: "prompt é obrigatório" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-      );
-    }
-
     const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
 
     const refsDescription = referenceImages
-      .map((_, i) => `IMAGE ${i + 2}${i === 0 ? " is the primary person/face/pose reference" : " is an extra visual reference"}`)
-      .join(", ");
-    const fullPrompt = `Using the provided images as visual inputs:
+      .map((_, i) => `IMAGEM ${i + 2}${i === 0 ? " = rosto e pose principal" : " = referência visual adicional"}`)
+      .join("; ");
+    const fullPrompt = `Usando DUAS imagens fornecidas como base:
 
-IMAGE 1 is the aesthetic base: use its environment, lighting, background mood, color temperature, and premium visual style.
-${refsDescription}.
+MAPEAMENTO DAS IMAGENS:
+- IMAGEM 1: ambiente, iluminação, fundo e estilo estético.
+- ${refsDescription}.
 
-OBJECTIVE:
-Create ONE single professional advertising creative for Instagram/Facebook by naturally combining the visual elements from the images. The final result must look like one original photo, not a collage.
+OBJETIVO:
+Criar UM ÚNICO criativo publicitário profissional para redes sociais (Instagram/Facebook), combinando elementos visuais das duas imagens de forma natural, moderna e altamente persuasiva.
 
-MANDATORY MERGE RULES:
-- Keep the face, identity, and main pose from IMAGE 2 as the central focus, conveying authority and trust.
-- Use the environment, lighting, and style from IMAGE 1 as the aesthetic foundation.
-- Harmonize colors, light direction, skin tones, and temperature with consistent cinematic color grading.
-- Make the blend realistic, seamless, and photographic, with no visible cutout or artificial montage.
-- Apply shallow depth of field with a softly blurred elegant background.
+REGRAS DE MESCLAGEM (OBRIGATÓRIO):
+- Manter o rosto e pose principal da imagem 2 como foco central (autoridade/confiança)
+- Usar o ambiente/iluminação/estilo da imagem 1 como base estética
+- Harmonizar cores, luz e temperatura entre as duas imagens (color grading consistente)
+- Garantir aparência realista (não artificial ou colagem visível)
+- Aplicar profundidade de campo suave (background levemente desfocado)
 
-COMPOSITION:
-- Vertical social media format, preferably 4:5 or 9:16.
-- Person centered or slightly shifted upward.
-- Preserve negative space in the lower area for readable text.
-- Crop and frame like a premium legal/professional social ad.
+COMPOSIÇÃO:
+- Formato vertical (4:5 ou 9:16)
+- Pessoa centralizada ou levemente deslocada para cima
+- Espaço negativo na parte inferior para texto
 
-VISUAL STYLE:
-- Legal, professional, premium, trustworthy, and persuasive.
-- Soft warm lighting, high facial sharpness, elegant minimal background.
-- Elevated contrast, subtle dark vignette, gentle dodge and burn on the face.
-- Slightly darken the background behind text zones to improve legibility.
+ESTILO VISUAL:
+- Estilo jurídico/profissional/premium
+- Iluminação suave e quente
+- Alta nitidez no rosto
+- Fundo elegante e minimalista
 
-TEXT IN THE CREATIVE:
-- Add a bold red attention banner at the top or center with short text such as "ATENÇÃO" or "STJ DECIDE".
-- Add a large uppercase white headline with strong contrast and light shadow.
-- Add a smaller CTA at the bottom: "Confira na legenda".
-- Use a modern, bold, highly legible sans-serif typeface.
-- Clear hierarchy: banner > headline > CTA.
+TEXTO NO CRIATIVO:
+- Inserir um banner vermelho chamativo no topo ou centro com texto curto (ex: "ATENÇÃO" ou "STJ DECIDE")
+- Abaixo, inserir headline grande em branco, caixa alta, forte contraste
+- Texto com sombra leve para legibilidade
+- Inserir CTA menor no final: "Confira na legenda"
 
-DEFAULT TEXT OPTIONS IF THE USER DOES NOT SPECIFY TEXT:
+TIPOGRAFIA:
+- Fonte sans-serif moderna, forte e legível
+- Hierarquia clara: título > subtítulo > CTA
+
+EXEMPLO DE TEXTO:
 Banner: "ATENÇÃO"
 Headline: "MESMO EM SEPARAÇÃO TOTAL, VOCÊ PODE TER QUE DIVIDIR SEUS BENS"
 CTA: "Confira na legenda"
 
-Alternative:
+OU
+
 Banner: "STJ DECIDE"
 Headline: "IMÓVEL COMPRADO ANTES DO CASAMENTO PODE SER DIVIDIDO"
 
-USER INSTRUCTION:
-${prompt}
+EFEITOS:
+- Leve vinheta escura nas bordas
+- Contraste elevado
+- Realce no rosto (dodge & burn leve)
+- Fundo levemente escurecido para destacar texto
 
-IMPORTANT:
-Do not create an artificial montage. The fusion must look like a single original professional legal advertising photo ready for high-conversion social media.`;
+INSTRUÇÃO DO USUÁRIO:
+${userPrompt}
+
+RESULTADO FINAL:
+Um criativo único, profissional, altamente chamativo, com aparência de anúncio real de advocacia, pronto para alta conversão em redes sociais.
+
+IMPORTANTE:
+Não criar montagem artificial. A fusão deve parecer uma única foto original.`;
 
     // Helper: convert data URL or http URL to {mimeType, base64}
     const toInlineData = async (
@@ -122,41 +132,22 @@ Do not create an artificial montage. The fusion must look like a single original
       return { mimeType, data: btoa(binary) };
     };
 
-    const freeImageFallback = async (reason: string) => {
-      try {
-        const seed = Math.floor(Math.random() * 1_000_000);
-        const enriched = `${prompt}. Professional photo composition, sharp focus, cinematic lighting, ultra realistic, 4k, social media post`;
-        const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(
-          enriched,
-        )}?width=1024&height=1024&model=flux-realism&seed=${seed}&nologo=true`;
-        const imgRes = await fetch(url);
-        if (!imgRes.ok) throw new Error(`Pollinations ${imgRes.status}`);
-        const buf = new Uint8Array(await imgRes.arrayBuffer());
-        let binary = "";
-        const chunk = 0x8000;
-        for (let i = 0; i < buf.length; i += chunk) {
-          binary += String.fromCharCode(...buf.subarray(i, i + chunk));
-        }
-        return new Response(
-          JSON.stringify({
-            imageUrl: `data:image/jpeg;base64,${btoa(binary)}`,
-            fallback: true,
-            provider: "pollinations-free",
-            fallbackReason: reason,
-          }),
-          { headers: { ...corsHeaders, "Content-Type": "application/json" } },
-        );
-      } catch (err) {
-        console.error("Free fallback failed:", err);
-        return new Response(
-          JSON.stringify({ error: "Geração grátis falhou. Tente novamente.", fallback: true }),
-          { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-        );
-      }
-    };
+    if (!GEMINI_API_KEY) {
+      return new Response(
+        JSON.stringify({
+          error: "GEMINI_API_KEY não configurada no backend.",
+          provider: "gemini-direct",
+        }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
 
     // PRIMARY PATH: Direct Google Gemini API (uses user's GEMINI_API_KEY, no Lovable credits)
-    if (GEMINI_API_KEY) {
+    const directModels = ["gemini-2.5-flash-image"];
+    let lastGeminiStatus = 502;
+    let lastGeminiError = "Gemini direto não retornou imagem.";
+
+    for (const model of directModels) {
       try {
         const allImages = [baseImage, ...referenceImages];
         const inlineParts = await Promise.all(
@@ -172,9 +163,14 @@ Do not create an artificial montage. The fusion must look like a single original
               parts: [{ text: fullPrompt }, ...inlineParts],
             },
           ],
+          generationConfig: {
+            responseModalities: ["TEXT", "IMAGE"],
+            maxOutputTokens: 8192,
+            temperature: 0.7,
+          },
         };
         const gResp = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent?key=${GEMINI_API_KEY}`,
+          `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -209,19 +205,34 @@ Do not create an artificial montage. The fusion must look like a single original
               { headers: { ...corsHeaders, "Content-Type": "application/json" } },
             );
           }
-          console.error("Gemini direct: no image in response");
+          lastGeminiError = `${model}: resposta sem imagem`;
+          console.error("Gemini direct: no image in response", model);
         } else {
           const t = await gResp.text();
-          console.error("Gemini direct error", gResp.status, t.slice(0, 300));
+          lastGeminiStatus = gResp.status;
+          lastGeminiError = `${model}: ${t.slice(0, 500)}`;
+          console.error("Gemini direct error", model, gResp.status, t.slice(0, 300));
+          if (gResp.status === 429) break;
         }
       } catch (err) {
-        console.error("Gemini direct exception:", err);
+        lastGeminiError = err instanceof Error ? err.message : "Erro desconhecido no Gemini direto";
+        console.error("Gemini direct exception:", model, err);
       }
-      return await freeImageFallback("Gemini direto não retornou imagem — usando geração grátis sem créditos Lovable.");
     }
 
-    return await freeImageFallback(
-      "GEMINI_API_KEY não configurada ou Gemini indisponível — usando fallback grátis sem créditos Lovable.",
+    return new Response(
+      JSON.stringify({
+        error:
+          lastGeminiStatus === 429
+            ? "A chave Gemini está configurada, mas está sem quota para geração/edição de imagem. Nenhum crédito Lovable foi usado."
+            : "Gemini direto não conseguiu gerar a imagem. Nenhum crédito Lovable foi usado.",
+        provider: "gemini-direct",
+        details: lastGeminiError,
+      }),
+      {
+        status: lastGeminiStatus === 429 ? 429 : 502,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      },
     );
   } catch (e) {
     console.error("image-combine error:", e);
