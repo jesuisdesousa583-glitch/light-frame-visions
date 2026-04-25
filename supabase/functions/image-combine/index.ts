@@ -143,7 +143,7 @@ Não criar montagem artificial. A fusão deve parecer uma única foto original.`
     }
 
     // PRIMARY PATH: Direct Google Gemini API (uses user's GEMINI_API_KEY, no Lovable credits)
-    const directModels = ["gemini-2.5-flash-image", "gemini-2.5-flash-image-preview"];
+    const directModels = ["gemini-2.5-flash-image"];
     let lastGeminiStatus = 502;
     let lastGeminiError = "Gemini direto não retornou imagem.";
 
@@ -212,6 +212,7 @@ Não criar montagem artificial. A fusão deve parecer uma única foto original.`
           lastGeminiStatus = gResp.status;
           lastGeminiError = `${model}: ${t.slice(0, 500)}`;
           console.error("Gemini direct error", model, gResp.status, t.slice(0, 300));
+          if (gResp.status === 429) break;
         }
       } catch (err) {
         lastGeminiError = err instanceof Error ? err.message : "Erro desconhecido no Gemini direto";
