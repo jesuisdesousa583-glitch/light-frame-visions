@@ -51,56 +51,69 @@ Deno.serve(async (req) => {
     const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
 
     const refsDescription = referenceImages
-      .map((_, i) => `IMAGE ${i + 2}${i === 0 ? " is the primary person/face/pose reference" : " is an extra visual reference"}`)
-      .join(", ");
-    const fullPrompt = `Using the provided images as visual inputs:
+      .map((_, i) => `IMAGEM ${i + 2}${i === 0 ? " = rosto e pose principal" : " = referência visual adicional"}`)
+      .join("; ");
+    const fullPrompt = `Usando DUAS imagens fornecidas como base:
 
-IMAGE 1 is the aesthetic base: use its environment, lighting, background mood, color temperature, and premium visual style.
-${refsDescription}.
+MAPEAMENTO DAS IMAGENS:
+- IMAGEM 1: ambiente, iluminação, fundo e estilo estético.
+- ${refsDescription}.
 
-OBJECTIVE:
-Create ONE single professional advertising creative for Instagram/Facebook by naturally combining the visual elements from the images. The final result must look like one original photo, not a collage.
+OBJETIVO:
+Criar UM ÚNICO criativo publicitário profissional para redes sociais (Instagram/Facebook), combinando elementos visuais das duas imagens de forma natural, moderna e altamente persuasiva.
 
-MANDATORY MERGE RULES:
-- Keep the face, identity, and main pose from IMAGE 2 as the central focus, conveying authority and trust.
-- Use the environment, lighting, and style from IMAGE 1 as the aesthetic foundation.
-- Harmonize colors, light direction, skin tones, and temperature with consistent cinematic color grading.
-- Make the blend realistic, seamless, and photographic, with no visible cutout or artificial montage.
-- Apply shallow depth of field with a softly blurred elegant background.
+REGRAS DE MESCLAGEM (OBRIGATÓRIO):
+- Manter o rosto e pose principal da imagem 2 como foco central (autoridade/confiança)
+- Usar o ambiente/iluminação/estilo da imagem 1 como base estética
+- Harmonizar cores, luz e temperatura entre as duas imagens (color grading consistente)
+- Garantir aparência realista (não artificial ou colagem visível)
+- Aplicar profundidade de campo suave (background levemente desfocado)
 
-COMPOSITION:
-- Vertical social media format, preferably 4:5 or 9:16.
-- Person centered or slightly shifted upward.
-- Preserve negative space in the lower area for readable text.
-- Crop and frame like a premium legal/professional social ad.
+COMPOSIÇÃO:
+- Formato vertical (4:5 ou 9:16)
+- Pessoa centralizada ou levemente deslocada para cima
+- Espaço negativo na parte inferior para texto
 
-VISUAL STYLE:
-- Legal, professional, premium, trustworthy, and persuasive.
-- Soft warm lighting, high facial sharpness, elegant minimal background.
-- Elevated contrast, subtle dark vignette, gentle dodge and burn on the face.
-- Slightly darken the background behind text zones to improve legibility.
+ESTILO VISUAL:
+- Estilo jurídico/profissional/premium
+- Iluminação suave e quente
+- Alta nitidez no rosto
+- Fundo elegante e minimalista
 
-TEXT IN THE CREATIVE:
-- Add a bold red attention banner at the top or center with short text such as "ATENÇÃO" or "STJ DECIDE".
-- Add a large uppercase white headline with strong contrast and light shadow.
-- Add a smaller CTA at the bottom: "Confira na legenda".
-- Use a modern, bold, highly legible sans-serif typeface.
-- Clear hierarchy: banner > headline > CTA.
+TEXTO NO CRIATIVO:
+- Inserir um banner vermelho chamativo no topo ou centro com texto curto (ex: "ATENÇÃO" ou "STJ DECIDE")
+- Abaixo, inserir headline grande em branco, caixa alta, forte contraste
+- Texto com sombra leve para legibilidade
+- Inserir CTA menor no final: "Confira na legenda"
 
-DEFAULT TEXT OPTIONS IF THE USER DOES NOT SPECIFY TEXT:
+TIPOGRAFIA:
+- Fonte sans-serif moderna, forte e legível
+- Hierarquia clara: título > subtítulo > CTA
+
+EXEMPLO DE TEXTO:
 Banner: "ATENÇÃO"
 Headline: "MESMO EM SEPARAÇÃO TOTAL, VOCÊ PODE TER QUE DIVIDIR SEUS BENS"
 CTA: "Confira na legenda"
 
-Alternative:
+OU
+
 Banner: "STJ DECIDE"
 Headline: "IMÓVEL COMPRADO ANTES DO CASAMENTO PODE SER DIVIDIDO"
 
-USER INSTRUCTION:
+EFEITOS:
+- Leve vinheta escura nas bordas
+- Contraste elevado
+- Realce no rosto (dodge & burn leve)
+- Fundo levemente escurecido para destacar texto
+
+INSTRUÇÃO DO USUÁRIO:
 ${prompt}
 
-IMPORTANT:
-Do not create an artificial montage. The fusion must look like a single original professional legal advertising photo ready for high-conversion social media.`;
+RESULTADO FINAL:
+Um criativo único, profissional, altamente chamativo, com aparência de anúncio real de advocacia, pronto para alta conversão em redes sociais.
+
+IMPORTANTE:
+Não criar montagem artificial. A fusão deve parecer uma única foto original.`;
 
     // Helper: convert data URL or http URL to {mimeType, base64}
     const toInlineData = async (
