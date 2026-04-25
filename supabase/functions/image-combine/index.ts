@@ -49,13 +49,8 @@ Deno.serve(async (req) => {
       );
     }
 
+    const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) {
-      return new Response(
-        JSON.stringify({ error: "LOVABLE_API_KEY não configurada" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-      );
-    }
 
     const refsDescription = referenceImages
       .map((_, i) => `IMAGE ${i + 2}`)
@@ -63,6 +58,98 @@ Deno.serve(async (req) => {
     const fullPrompt = `IMAGE 1 is the base subject (preserve identity, face, pose). ${refsDescription} ${
       referenceImages.length > 1 ? "are references" : "is the reference"
     } for style/background/elements (combine them as instructed). Instruction: ${prompt}`;
+
+    // Helper: convert data URL or http URL to {mimeType, base64}
+    const toInlineData = async (
+      url: string,
+    ): Promise<{ mimeType: string; data: string }> => {
+      if (url.startsWith("data:")) {
+        const [head, b64] = url.split(",");
+        const mimeType = head.match(/data:([^;]+)/)?.[1] ?? "image/jpeg";
+        return { mimeType, data: b64 };
+      }
+      const r = await fetch(url);
+      const buf = new Uint8Array(await r.arrayBuffer());
+      const mimeType = r.headers.get("content-type") ?? "image/jpeg";
+      let binary = "";
+      const chunk = 0x8000;
+      for (let i = 0; i < buf.length; i += chunk) {
+        binary += String.fromCharCode(...buf.subarray(i, i + chunk));
+      }
+      return { mimeType, data: btoa(binary) };
+    };
+
+    // PRIMARY PATH: Direct Google Gemini API (uses user's GEMINI_API_KEY, no Lovable credits)
+    if (GEMINI_API_KEY) {
+      try {
+        const allImages = [baseImage, ...referenceImages];
+        const inlineParts = await Promise.all(
+          allImages.map(async (u) => {
+            const { mimeType, data } = await toInlineData(u);
+            return { inline_data: { mime_type: mimeType, data } };
+          }),
+        );
+        const geminiBody = {
+          contents: [
+            {
+              role: "user",
+              parts: [{ text: fullPrompt }, ...inlineParts],
+            },
+          ],
+        };
+        const gResp = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent?key=${GEMINI_API_KEY}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(geminiBody),
+          },
+        );
+        if (gResp.ok) {
+          const gData = await gResp.json();
+          const parts = gData?.candidates?.[0]?.content?.parts ?? [];
+          const imgPart = parts.find(
+            (p: Record<string, unknown>) =>
+              (p as { inline_data?: unknown }).inline_data ||
+              (p as { inlineData?: unknown }).inlineData,
+          );
+          const inline =
+            (imgPart as { inline_data?: { mime_type: string; data: string } })
+              ?.inline_data ??
+            (imgPart as { inlineData?: { mimeType: string; data: string } })
+              ?.inlineData;
+          if (inline) {
+            const mt =
+              (inline as { mime_type?: string; mimeType?: string }).mime_type ??
+              (inline as { mimeType?: string }).mimeType ??
+              "image/png";
+            const dataUrl = `data:${mt};base64,${inline.data}`;
+            return new Response(
+              JSON.stringify({
+                imageUrl: dataUrl,
+                fallback: false,
+                provider: "gemini-direct",
+              }),
+              { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+            );
+          }
+          console.error("Gemini direct: no image in response");
+        } else {
+          const t = await gResp.text();
+          console.error("Gemini direct error", gResp.status, t.slice(0, 300));
+        }
+      } catch (err) {
+        console.error("Gemini direct exception:", err);
+      }
+      // fall through to Lovable AI / Pollinations
+    }
+
+    if (!LOVABLE_API_KEY) {
+      return new Response(
+        JSON.stringify({ error: "Nenhuma API key configurada (GEMINI_API_KEY ou LOVABLE_API_KEY)" }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
 
     const content: Array<Record<string, unknown>> = [
       { type: "text", text: fullPrompt },
