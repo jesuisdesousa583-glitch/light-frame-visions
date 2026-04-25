@@ -15,7 +15,11 @@ Deno.serve(async (req) => {
 
   try {
     const body = await req.json();
-    const { baseImage, prompt } = body;
+    const { baseImage } = body;
+    const userPrompt =
+      typeof body.prompt === "string" && body.prompt.trim().length > 0
+        ? body.prompt.trim()
+        : "Use o texto padrão do criativo jurídico, mantendo o resultado premium, realista e pronto para redes sociais.";
     // Aceita `referenceImages` (array) OU `referenceImage` (string, legado)
     const refsRaw: unknown =
       body.referenceImages ?? (body.referenceImage ? [body.referenceImage] : []);
@@ -41,13 +45,6 @@ Deno.serve(async (req) => {
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
-    if (!prompt || typeof prompt !== "string") {
-      return new Response(
-        JSON.stringify({ error: "prompt é obrigatório" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-      );
-    }
-
     const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
 
     const refsDescription = referenceImages
@@ -107,7 +104,7 @@ EFEITOS:
 - Fundo levemente escurecido para destacar texto
 
 INSTRUÇÃO DO USUÁRIO:
-${prompt}
+${userPrompt}
 
 RESULTADO FINAL:
 Um criativo único, profissional, altamente chamativo, com aparência de anúncio real de advocacia, pronto para alta conversão em redes sociais.
