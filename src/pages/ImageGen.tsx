@@ -171,7 +171,7 @@ export default function ImageGen() {
     }
   };
 
-  // -------- Modo "Combinar 2 imagens" (Nano Banana via Lovable AI — pago) --------
+  // -------- Modo "Combinar 2 imagens" (Gemini direto no backend — sem créditos Lovable) --------
   const baseFileRef = useRef<HTMLInputElement>(null);
   const refFileRef = useRef<HTMLInputElement>(null);
   const [baseImg, setBaseImg] = useState<string | null>(null);
@@ -215,7 +215,6 @@ export default function ImageGen() {
   const handleCombine = async () => {
     if (!baseImg) return toast.error("Envie a foto base (do criativo)");
     if (refImgs.length === 0) return toast.error("Envie ao menos 1 foto de referência");
-    if (!combinePrompt.trim()) return toast.error("Descreva como combinar");
     setCombining(true);
     setCombinedUrl(null);
     setVariants(null);
@@ -223,7 +222,7 @@ export default function ImageGen() {
       const { data, error } = await supabase.functions.invoke("image-combine", {
         body: { baseImage: baseImg, referenceImages: refImgs, prompt: combinePrompt },
       });
-      if (error) throw error;
+      if (error) throw new Error(data?.error || error.message || "Falha ao combinar");
       if (!data?.imageUrl) throw new Error(data?.error || "Sem imagem na resposta");
       setCombinedUrl(data.imageUrl);
       // Gera os 4 formatos a partir da MESMA imagem (sem créditos extras)
