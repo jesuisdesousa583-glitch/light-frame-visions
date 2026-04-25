@@ -235,6 +235,8 @@ export default function ImageGen() {
             "Geração grátis usada (sem suas fotos como referência visual).",
           { duration: 6000 },
         );
+      } else if (data.provider === "gemini-direct") {
+        toast.success("Imagem gerada via Gemini direto, sem créditos Lovable!");
       } else {
         toast.success("Imagem gerada nos 4 formatos!");
       }
