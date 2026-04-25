@@ -174,7 +174,7 @@ Deno.serve(async (req) => {
       } catch (err) {
         console.error("Gemini direct exception:", err);
       }
-      // fall through to Lovable AI / Pollinations
+      return await freeImageFallback("Gemini direto não retornou imagem — usando geração grátis sem créditos Lovable.");
     }
 
     if (!LOVABLE_API_KEY) {
