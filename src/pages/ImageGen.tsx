@@ -546,12 +546,11 @@ export default function ImageGen() {
 
             {/* -------- ABA COMBINAR 2 IMAGENS -------- */}
             <TabsContent value="combine" className="mt-6">
-              <div className="mb-4 flex items-start gap-2 rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm text-muted-foreground">
-                <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-destructive" />
+              <div className="mb-4 flex items-start gap-2 rounded-md border border-border bg-muted/30 p-3 text-sm text-muted-foreground">
+                <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
                 <p>
-                  Modo <strong>Combinar 2 imagens</strong> usa o Nano Banana (Gemini Flash Image)
-                  via Lovable AI — único modelo que aceita 2 imagens.{" "}
-                  <strong>Consome créditos do Lovable AI</strong> ($1 grátis/mês, depois pré-pago).
+                  Modo <strong>Combinar imagens</strong> usa a chave Gemini configurada no backend
+                  para mesclar a foto base com até 4 referências. <strong>Não consome créditos Lovable</strong>.
                 </p>
               </div>
 
