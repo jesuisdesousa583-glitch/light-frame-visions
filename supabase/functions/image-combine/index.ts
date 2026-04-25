@@ -79,6 +79,39 @@ Deno.serve(async (req) => {
       return { mimeType, data: btoa(binary) };
     };
 
+    const freeImageFallback = async (reason: string) => {
+      try {
+        const seed = Math.floor(Math.random() * 1_000_000);
+        const enriched = `${prompt}. Professional photo composition, sharp focus, cinematic lighting, ultra realistic, 4k, social media post`;
+        const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(
+          enriched,
+        )}?width=1024&height=1024&model=flux-realism&seed=${seed}&nologo=true`;
+        const imgRes = await fetch(url);
+        if (!imgRes.ok) throw new Error(`Pollinations ${imgRes.status}`);
+        const buf = new Uint8Array(await imgRes.arrayBuffer());
+        let binary = "";
+        const chunk = 0x8000;
+        for (let i = 0; i < buf.length; i += chunk) {
+          binary += String.fromCharCode(...buf.subarray(i, i + chunk));
+        }
+        return new Response(
+          JSON.stringify({
+            imageUrl: `data:image/jpeg;base64,${btoa(binary)}`,
+            fallback: true,
+            provider: "pollinations-free",
+            fallbackReason: reason,
+          }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        );
+      } catch (err) {
+        console.error("Free fallback failed:", err);
+        return new Response(
+          JSON.stringify({ error: "Geração grátis falhou. Tente novamente.", fallback: true }),
+          { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        );
+      }
+    };
+
     // PRIMARY PATH: Direct Google Gemini API (uses user's GEMINI_API_KEY, no Lovable credits)
     if (GEMINI_API_KEY) {
       try {
