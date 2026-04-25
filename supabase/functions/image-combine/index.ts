@@ -1,7 +1,6 @@
 // Edge function: image-combine
-// Combina 2 imagens (foto-base + referência de estilo/fundo/elemento) usando
-// Nano Banana (google/gemini-2.5-flash-image) via Lovable AI Gateway.
-// CONSOME créditos do workspace Lovable AI.
+// Combina foto-base + referências usando a chave Gemini configurada no backend.
+// Não chama Lovable AI Gateway, portanto não consome créditos Lovable.
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -50,14 +49,58 @@ Deno.serve(async (req) => {
     }
 
     const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
 
     const refsDescription = referenceImages
-      .map((_, i) => `IMAGE ${i + 2}`)
+      .map((_, i) => `IMAGE ${i + 2}${i === 0 ? " is the primary person/face/pose reference" : " is an extra visual reference"}`)
       .join(", ");
-    const fullPrompt = `IMAGE 1 is the base subject (preserve identity, face, pose). ${refsDescription} ${
-      referenceImages.length > 1 ? "are references" : "is the reference"
-    } for style/background/elements (combine them as instructed). Instruction: ${prompt}`;
+    const fullPrompt = `Using the provided images as visual inputs:
+
+IMAGE 1 is the aesthetic base: use its environment, lighting, background mood, color temperature, and premium visual style.
+${refsDescription}.
+
+OBJECTIVE:
+Create ONE single professional advertising creative for Instagram/Facebook by naturally combining the visual elements from the images. The final result must look like one original photo, not a collage.
+
+MANDATORY MERGE RULES:
+- Keep the face, identity, and main pose from IMAGE 2 as the central focus, conveying authority and trust.
+- Use the environment, lighting, and style from IMAGE 1 as the aesthetic foundation.
+- Harmonize colors, light direction, skin tones, and temperature with consistent cinematic color grading.
+- Make the blend realistic, seamless, and photographic, with no visible cutout or artificial montage.
+- Apply shallow depth of field with a softly blurred elegant background.
+
+COMPOSITION:
+- Vertical social media format, preferably 4:5 or 9:16.
+- Person centered or slightly shifted upward.
+- Preserve negative space in the lower area for readable text.
+- Crop and frame like a premium legal/professional social ad.
+
+VISUAL STYLE:
+- Legal, professional, premium, trustworthy, and persuasive.
+- Soft warm lighting, high facial sharpness, elegant minimal background.
+- Elevated contrast, subtle dark vignette, gentle dodge and burn on the face.
+- Slightly darken the background behind text zones to improve legibility.
+
+TEXT IN THE CREATIVE:
+- Add a bold red attention banner at the top or center with short text such as "ATENÇÃO" or "STJ DECIDE".
+- Add a large uppercase white headline with strong contrast and light shadow.
+- Add a smaller CTA at the bottom: "Confira na legenda".
+- Use a modern, bold, highly legible sans-serif typeface.
+- Clear hierarchy: banner > headline > CTA.
+
+DEFAULT TEXT OPTIONS IF THE USER DOES NOT SPECIFY TEXT:
+Banner: "ATENÇÃO"
+Headline: "MESMO EM SEPARAÇÃO TOTAL, VOCÊ PODE TER QUE DIVIDIR SEUS BENS"
+CTA: "Confira na legenda"
+
+Alternative:
+Banner: "STJ DECIDE"
+Headline: "IMÓVEL COMPRADO ANTES DO CASAMENTO PODE SER DIVIDIDO"
+
+USER INSTRUCTION:
+${prompt}
+
+IMPORTANT:
+Do not create an artificial montage. The fusion must look like a single original professional legal advertising photo ready for high-conversion social media.`;
 
     // Helper: convert data URL or http URL to {mimeType, base64}
     const toInlineData = async (
