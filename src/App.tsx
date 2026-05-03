@@ -13,6 +13,7 @@ import Messages from "./pages/Messages";
 import ImageGen from "./pages/ImageGen";
 import Schedule from "./pages/Schedule";
 import NotFound from "./pages/NotFound";
+import CloneApp from "./CloneApp";
 import { DebugErrorThrower } from "@/components/debug/DebugErrorThrower";
 import { ErrorDebugPopup } from "@/components/debug/ErrorDebugPopup";
 
@@ -38,6 +39,7 @@ const App = () => (
             <Route path="/messages" element={<Messages />} />
             <Route path="/image-gen" element={<ImageGen />} />
             <Route path="/schedule" element={<Schedule />} />
+            <Route path="/clone/*" element={<CloneApp />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
