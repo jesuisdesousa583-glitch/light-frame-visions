@@ -49,13 +49,13 @@ export default function Landing() {
           <nav className="hidden md:flex items-center gap-8 text-sm text-nude-600">
             <a href="#features" className="hover:text-gold-700 transition-colors">Funcionalidades</a>
             <a href="#how" className="hover:text-gold-700 transition-colors">Como funciona</a>
-            <Link to="/consulta" className="hover:text-gold-700 transition-colors">Consultar processo</Link>
+            <Link to="/clone/consulta" className="hover:text-gold-700 transition-colors">Consultar processo</Link>
           </nav>
           <div className="flex items-center gap-2">
-            <Button variant="ghost" className="text-nude-700 hover:text-gold-700 hover:bg-gold-50" onClick={() => navigate("/login")} data-testid="nav-login-btn">Entrar</Button>
+            <Button variant="ghost" className="text-nude-700 hover:text-gold-700 hover:bg-gold-50" onClick={() => navigate("/clone/login")} data-testid="nav-login-btn">Entrar</Button>
             <Button
               className="bg-gradient-to-r from-gold-500 to-gold-600 hover:from-gold-600 hover:to-gold-700 text-white font-medium shadow-sm"
-              onClick={() => navigate("/login")} data-testid="nav-cta-btn">
+              onClick={() => navigate("/clone/login")} data-testid="nav-cta-btn">
               Começar grátis
             </Button>
           </div>
@@ -108,7 +108,7 @@ export default function Landing() {
                 <Button
                   size="lg"
                   className="bg-gradient-to-r from-gold-500 to-gold-700 hover:from-gold-400 hover:to-gold-600 text-nude-900 font-semibold h-12 px-7 text-base shadow-xl shadow-gold-900/40"
-                  onClick={() => navigate("/login")}
+                  onClick={() => navigate("/clone/login")}
                   data-testid="hero-cta-primary"
                 >
                   Começar agora <ArrowRight className="ml-2 w-4 h-4" />
@@ -259,8 +259,8 @@ export default function Landing() {
             <span>© 2026 Espírito Santo Adv · Todos os direitos reservados</span>
           </div>
           <div className="flex gap-6">
-            <Link to="/consulta" className="hover:text-gold-200">Consultar processo</Link>
-            <Link to="/login" className="hover:text-gold-200">Entrar</Link>
+            <Link to="/clone/consulta" className="hover:text-gold-200">Consultar processo</Link>
+            <Link to="/clone/login" className="hover:text-gold-200">Entrar</Link>
             <a href="#features" className="hover:text-gold-200">Funcionalidades</a>
           </div>
         </div>

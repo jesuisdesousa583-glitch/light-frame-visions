@@ -33,7 +33,7 @@ export default function Login() {
       try { await api.post("/seed/demo"); } catch {}
       toast.success("Bem-vinda de volta");
       const done = localStorage.getItem("onboarding_done");
-      navigate(done ? "/app" : "/app/onboarding");
+      navigate(done ? "/clone/app" : "/clone/app/onboarding");
     } catch (err) {
       toast.error(err.response?.data?.detail || "Erro ao entrar");
     } finally { setLoading(false); }
@@ -48,7 +48,7 @@ export default function Login() {
     try {
       await register(regData);
       toast.success("Conta criada. Vamos configurar seu escritório.");
-      navigate("/app/onboarding");
+      navigate("/clone/app/onboarding");
     } catch (err) {
       toast.error(err.response?.data?.detail || "Erro no cadastro");
     } finally { setLoading(false); }

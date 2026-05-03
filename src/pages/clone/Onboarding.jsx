@@ -98,9 +98,9 @@ export default function Onboarding() {
       localStorage.setItem("office_info", JSON.stringify(data));
       await api.post("/seed/demo").catch(() => {});
       toast.success("Onboarding concluído!");
-      navigate("/app");
+      navigate("/clone/app");
     } catch {
-      navigate("/app");
+      navigate("/clone/app");
     }
   };
 

@@ -12,20 +12,20 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 const LOGO_IMG = "https://customer-assets.emergentagent.com/job_nude-gold-dashboard/artifacts/ckw9kwam_IMG-20241228-WA0003.jpg";
 
 const NAV = [
-  { to: "/app", label: "Atendimento", icon: LayoutDashboard, end: true, testid: "nav-dashboard" },
-  { to: "/app/chat-ia", label: "Chat IA · Análise", icon: Bot, testid: "nav-chat-ia" },
-  { to: "/app/admin", label: "Painel Admin · Casos", icon: ShieldCheck, testid: "nav-admin" },
-  { to: "/app/crm", label: "CRM Pipeline", icon: KanbanSquare, testid: "nav-crm" },
-  { to: "/app/agenda", label: "Agenda", icon: CalendarDays, testid: "nav-agenda" },
-  { to: "/app/processes", label: "Processos", icon: Scale, testid: "nav-processes" },
-  { to: "/app/finance", label: "Financeiro", icon: Wallet, testid: "nav-finance" },
-  { to: "/app/creatives", label: "Criativos", icon: Sparkles, testid: "nav-creatives" },
-  { to: "/app/image-fusion", label: "Fusão de Imagens", icon: Combine, testid: "nav-image-fusion" },
-  { to: "/app/analytics", label: "Métricas", icon: BarChart3, testid: "nav-analytics" },
-  { to: "/app/whatsapp", label: "WhatsApp", icon: MessageSquare, testid: "nav-whatsapp" },
-  { to: "/app/whatsapp-logs", label: "Logs WhatsApp", icon: Radio, testid: "nav-whatsapp-logs" },
-  { to: "/app/settings", label: "Configurações", icon: SettingsIcon, testid: "nav-settings" },
-  { to: "/app/debug", label: "Debug Tool", icon: Wrench, testid: "nav-debug" },
+  { to: "/clone/app", label: "Atendimento", icon: LayoutDashboard, end: true, testid: "nav-dashboard" },
+  { to: "/clone/app/chat-ia", label: "Chat IA · Análise", icon: Bot, testid: "nav-chat-ia" },
+  { to: "/clone/app/admin", label: "Painel Admin · Casos", icon: ShieldCheck, testid: "nav-admin" },
+  { to: "/clone/app/crm", label: "CRM Pipeline", icon: KanbanSquare, testid: "nav-crm" },
+  { to: "/clone/app/agenda", label: "Agenda", icon: CalendarDays, testid: "nav-agenda" },
+  { to: "/clone/app/processes", label: "Processos", icon: Scale, testid: "nav-processes" },
+  { to: "/clone/app/finance", label: "Financeiro", icon: Wallet, testid: "nav-finance" },
+  { to: "/clone/app/creatives", label: "Criativos", icon: Sparkles, testid: "nav-creatives" },
+  { to: "/clone/app/image-fusion", label: "Fusão de Imagens", icon: Combine, testid: "nav-image-fusion" },
+  { to: "/clone/app/analytics", label: "Métricas", icon: BarChart3, testid: "nav-analytics" },
+  { to: "/clone/app/whatsapp", label: "WhatsApp", icon: MessageSquare, testid: "nav-whatsapp" },
+  { to: "/clone/app/whatsapp-logs", label: "Logs WhatsApp", icon: Radio, testid: "nav-whatsapp-logs" },
+  { to: "/clone/app/settings", label: "Configurações", icon: SettingsIcon, testid: "nav-settings" },
+  { to: "/clone/app/debug", label: "Debug Tool", icon: Wrench, testid: "nav-debug" },
 ];
 
 export default function AppLayout() {
@@ -34,7 +34,7 @@ export default function AppLayout() {
 
   const handleLogout = () => {
     logout();
-    navigate("/login");
+    navigate("/clone/login");
   };
 
   const initials = (user?.name || "U").split(" ").map((s) => s[0]).slice(0, 2).join("").toUpperCase();
