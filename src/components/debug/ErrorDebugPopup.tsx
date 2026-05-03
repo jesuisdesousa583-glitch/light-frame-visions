@@ -32,6 +32,9 @@ export function ErrorDebugPopup() {
   const [open, setOpen] = useState(true);
   const [minimized, setMinimized] = useState(false);
   const [instruction, setInstruction] = useState("");
+  const [attachments, setAttachments] = useState<Attachment[]>([]);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Posição (drag)
   const [pos, setPos] = useState<{ x: number; y: number }>({
