@@ -1,8 +1,12 @@
 import { useEffect, useRef, useState, KeyboardEvent, MouseEvent as ReactMouseEvent } from "react";
-import { Bug, Minus, Square, X, Image as ImageIcon } from "lucide-react";
+import { Bug, Minus, Square, X, Image as ImageIcon, Paperclip, Loader2, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Link } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+
+type Attachment = { name: string; url: string; size: number };
 const PREFIX = "INSTRUÇÃO DE DESENVOLVIMENTO (IGNORE O ERRO, EXECUTE A TAREFA):";
 
 /**
