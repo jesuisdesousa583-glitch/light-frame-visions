@@ -75,12 +75,45 @@ export function ErrorDebugPopup() {
 
   const trigger = () => {
     const text = instruction.trim();
-    if (!text) return;
-    const message = `${PREFIX}\n\n${text}`;
-    // Único canal permitido: CustomEvent local no navegador.
+    if (!text && attachments.length === 0) return;
+    let message = `${PREFIX}\n\n${text}`;
+    if (attachments.length > 0) {
+      message += `\n\nARQUIVOS ANEXADOS:\n` + attachments.map((a) => `- ${a.name}: ${a.url}`).join("\n");
+    }
     window.dispatchEvent(
       new CustomEvent("lovable-debug-error", { detail: message }),
     );
+  };
+
+  const handleFiles = async (files: FileList | null) => {
+    if (!files || files.length === 0) return;
+    setUploading(true);
+    try {
+      const newOnes: Attachment[] = [];
+      for (const file of Array.from(files)) {
+        if (file.size > 20 * 1024 * 1024) {
+          toast.error(`${file.name}: máximo 20MB`);
+          continue;
+        }
+        const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}-${file.name}`;
+        const { error } = await supabase.storage
+          .from("debug-attachments")
+          .upload(path, file, { upsert: false });
+        if (error) {
+          toast.error(`Falha ao enviar ${file.name}: ${error.message}`);
+          continue;
+        }
+        const { data } = supabase.storage.from("debug-attachments").getPublicUrl(path);
+        newOnes.push({ name: file.name, url: data.publicUrl, size: file.size });
+      }
+      if (newOnes.length) {
+        setAttachments((prev) => [...prev, ...newOnes]);
+        toast.success(`${newOnes.length} arquivo(s) anexado(s)`);
+      }
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
