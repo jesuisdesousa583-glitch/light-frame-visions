@@ -39,6 +39,7 @@ const App = () => (
             <Route path="/messages" element={<Messages />} />
             <Route path="/image-gen" element={<ImageGen />} />
             <Route path="/schedule" element={<Schedule />} />
+            <Route path="/clone/*" element={<CloneApp />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
