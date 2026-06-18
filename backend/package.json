@@ -1,0 +1,14 @@
+{
+  "name": "render-backend-compat",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Compatibilidade para deploys do Render configurados com Root Directory em backend.",
+  "engines": {
+    "node": "20.x"
+  },
+  "scripts": {
+    "postinstall": "cd .. && npm install && npm run build && rm -rf backend/dist && cp -R dist backend/dist",
+    "build": "cd .. && npm run build",
+    "start": "cd .. && npm run preview -- --host 0.0.0.0 --port ${PORT:-4173}"
+  }
+}
