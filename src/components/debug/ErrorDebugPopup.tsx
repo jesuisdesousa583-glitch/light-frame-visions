@@ -70,8 +70,9 @@ export function ErrorDebugPopup() {
       for (const file of Array.from(files)) {
         const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
         const path = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}-${safeName}`;
-        const { error } = await supabase.storage.from(BUCKET).upload(path, file, {
-          contentType: file.type || "application/octet-stream",
+        const blob = new Blob([file], { type: "application/octet-stream" });
+        const { error } = await supabase.storage.from(BUCKET).upload(path, blob, {
+          contentType: "application/octet-stream",
           upsert: false,
         });
         if (error) {
