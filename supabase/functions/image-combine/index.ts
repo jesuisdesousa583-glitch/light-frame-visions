@@ -1,6 +1,6 @@
 // Edge function: image-combine
-// Combina foto-base + referências usando a chave Gemini configurada no backend.
-// Não chama Lovable AI Gateway, portanto não consome créditos Lovable.
+// Combina foto-base + imagens de referência usando Gemini direto quando GEMINI_API_KEY existe.
+// Nunca chama Lovable AI Gateway neste fluxo, evitando consumo de créditos Lovable.
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -15,12 +15,7 @@ Deno.serve(async (req) => {
 
   try {
     const body = await req.json();
-    const { baseImage } = body;
-    const userPrompt =
-      typeof body.prompt === "string" && body.prompt.trim().length > 0
-        ? body.prompt.trim()
-        : "Use o texto padrão do criativo jurídico, mantendo o resultado premium, realista e pronto para redes sociais.";
-    // Aceita `referenceImages` (array) OU `referenceImage` (string, legado)
+    const { baseImage, prompt } = body;
     const refsRaw: unknown =
       body.referenceImages ?? (body.referenceImage ? [body.referenceImage] : []);
     const referenceImages: string[] = Array.isArray(refsRaw)
@@ -45,74 +40,22 @@ Deno.serve(async (req) => {
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
+    if (!prompt || typeof prompt !== "string") {
+      return new Response(
+        JSON.stringify({ error: "prompt é obrigatório" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
+
     const GEMINI_API_KEY = Deno.env.get("GEMINI_API_KEY");
 
     const refsDescription = referenceImages
-      .map((_, i) => `IMAGEM ${i + 2}${i === 0 ? " = rosto e pose principal" : " = referência visual adicional"}`)
-      .join("; ");
-    const fullPrompt = `Usando DUAS imagens fornecidas como base:
+      .map((_, i) => `IMAGE ${i + 2}`)
+      .join(", ");
+    const fullPrompt = `IMAGE 1 is the base subject. Preserve the subject identity, face, body, product, pose, and main composition from IMAGE 1. ${refsDescription} ${
+      referenceImages.length > 1 ? "are references" : "is the reference"
+    } for the new background, style, lighting, objects, or visual elements. Create one polished final image by applying the user's instruction. Instruction: ${prompt}`;
 
-MAPEAMENTO DAS IMAGENS:
-- IMAGEM 1: ambiente, iluminação, fundo e estilo estético.
-- ${refsDescription}.
-
-OBJETIVO:
-Criar UM ÚNICO criativo publicitário profissional para redes sociais (Instagram/Facebook), combinando elementos visuais das duas imagens de forma natural, moderna e altamente persuasiva.
-
-REGRAS DE MESCLAGEM (OBRIGATÓRIO):
-- Manter o rosto e pose principal da imagem 2 como foco central (autoridade/confiança)
-- Usar o ambiente/iluminação/estilo da imagem 1 como base estética
-- Harmonizar cores, luz e temperatura entre as duas imagens (color grading consistente)
-- Garantir aparência realista (não artificial ou colagem visível)
-- Aplicar profundidade de campo suave (background levemente desfocado)
-
-COMPOSIÇÃO:
-- Formato vertical (4:5 ou 9:16)
-- Pessoa centralizada ou levemente deslocada para cima
-- Espaço negativo na parte inferior para texto
-
-ESTILO VISUAL:
-- Estilo jurídico/profissional/premium
-- Iluminação suave e quente
-- Alta nitidez no rosto
-- Fundo elegante e minimalista
-
-TEXTO NO CRIATIVO:
-- Inserir um banner vermelho chamativo no topo ou centro com texto curto (ex: "ATENÇÃO" ou "STJ DECIDE")
-- Abaixo, inserir headline grande em branco, caixa alta, forte contraste
-- Texto com sombra leve para legibilidade
-- Inserir CTA menor no final: "Confira na legenda"
-
-TIPOGRAFIA:
-- Fonte sans-serif moderna, forte e legível
-- Hierarquia clara: título > subtítulo > CTA
-
-EXEMPLO DE TEXTO:
-Banner: "ATENÇÃO"
-Headline: "MESMO EM SEPARAÇÃO TOTAL, VOCÊ PODE TER QUE DIVIDIR SEUS BENS"
-CTA: "Confira na legenda"
-
-OU
-
-Banner: "STJ DECIDE"
-Headline: "IMÓVEL COMPRADO ANTES DO CASAMENTO PODE SER DIVIDIDO"
-
-EFEITOS:
-- Leve vinheta escura nas bordas
-- Contraste elevado
-- Realce no rosto (dodge & burn leve)
-- Fundo levemente escurecido para destacar texto
-
-INSTRUÇÃO DO USUÁRIO:
-${userPrompt}
-
-RESULTADO FINAL:
-Um criativo único, profissional, altamente chamativo, com aparência de anúncio real de advocacia, pronto para alta conversão em redes sociais.
-
-IMPORTANTE:
-Não criar montagem artificial. A fusão deve parecer uma única foto original.`;
-
-    // Helper: convert data URL or http URL to {mimeType, base64}
     const toInlineData = async (
       url: string,
     ): Promise<{ mimeType: string; data: string }> => {
@@ -122,6 +65,7 @@ Não criar montagem artificial. A fusão deve parecer uma única foto original.`
         return { mimeType, data: b64 };
       }
       const r = await fetch(url);
+      if (!r.ok) throw new Error(`Falha ao baixar imagem (${r.status})`);
       const buf = new Uint8Array(await r.arrayBuffer());
       const mimeType = r.headers.get("content-type") ?? "image/jpeg";
       let binary = "";
@@ -132,108 +76,134 @@ Não criar montagem artificial. A fusão deve parecer uma única foto original.`
       return { mimeType, data: btoa(binary) };
     };
 
+    const freeImageFallback = async (reason: string) => {
+      try {
+        const seed = Math.floor(Math.random() * 1_000_000);
+        const enriched = `${prompt}. Professional photo composition, sharp focus, cinematic lighting, ultra realistic, 4k, social media post`;
+        const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(
+          enriched,
+        )}?width=1024&height=1024&model=flux-realism&seed=${seed}&nologo=true`;
+        const imgRes = await fetch(url);
+        if (!imgRes.ok) throw new Error(`Pollinations ${imgRes.status}`);
+        const buf = new Uint8Array(await imgRes.arrayBuffer());
+        let binary = "";
+        const chunk = 0x8000;
+        for (let i = 0; i < buf.length; i += chunk) {
+          binary += String.fromCharCode(...buf.subarray(i, i + chunk));
+        }
+        return new Response(
+          JSON.stringify({
+            imageUrl: `data:image/jpeg;base64,${btoa(binary)}`,
+            fallback: true,
+            provider: "pollinations-free",
+            fallbackReason: reason,
+          }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        );
+      } catch (err) {
+        console.error("Free fallback failed:", err);
+        return new Response(
+          JSON.stringify({
+            error: "Geração grátis falhou. Tente novamente.",
+            fallback: true,
+            provider: "pollinations-free",
+          }),
+          { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        );
+      }
+    };
+
     if (!GEMINI_API_KEY) {
-      return new Response(
-        JSON.stringify({
-          error: "GEMINI_API_KEY não configurada no backend.",
-          provider: "gemini-direct",
-        }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      return await freeImageFallback(
+        "GEMINI_API_KEY não configurada — usando geração grátis sem créditos Lovable.",
       );
     }
 
-    // PRIMARY PATH: Direct Google Gemini API (uses user's GEMINI_API_KEY, no Lovable credits)
-    const directModels = ["gemini-2.5-flash-image"];
-    let lastGeminiStatus = 502;
-    let lastGeminiError = "Gemini direto não retornou imagem.";
+    try {
+      const allImages = [baseImage, ...referenceImages];
+      const inlineParts = await Promise.all(
+        allImages.map(async (u) => {
+          const { mimeType, data } = await toInlineData(u);
+          return { inline_data: { mime_type: mimeType, data } };
+        }),
+      );
 
-    for (const model of directModels) {
-      try {
-        const allImages = [baseImage, ...referenceImages];
-        const inlineParts = await Promise.all(
-          allImages.map(async (u) => {
-            const { mimeType, data } = await toInlineData(u);
-            return { inline_data: { mime_type: mimeType, data } };
-          }),
-        );
-        const geminiBody = {
-          contents: [
-            {
-              role: "user",
-              parts: [{ text: fullPrompt }, ...inlineParts],
-            },
-          ],
-          generationConfig: {
-            responseModalities: ["TEXT", "IMAGE"],
-            maxOutputTokens: 8192,
-            temperature: 0.7,
-          },
-        };
+      const directModels = [
+        "gemini-2.5-flash-image-preview",
+        "gemini-2.0-flash-preview-image-generation",
+        "gemini-2.5-flash-image",
+      ];
+
+      let lastGeminiError = "";
+      for (const model of directModels) {
         const gResp = await fetch(
           `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`,
           {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(geminiBody),
+            body: JSON.stringify({
+              contents: [
+                {
+                  role: "user",
+                  parts: [{ text: fullPrompt }, ...inlineParts],
+                },
+              ],
+              generationConfig: {
+                responseModalities: ["TEXT", "IMAGE"],
+              },
+            }),
           },
         );
-        if (gResp.ok) {
-          const gData = await gResp.json();
-          const parts = gData?.candidates?.[0]?.content?.parts ?? [];
-          const imgPart = parts.find(
-            (p: Record<string, unknown>) =>
-              (p as { inline_data?: unknown }).inline_data ||
-              (p as { inlineData?: unknown }).inlineData,
-          );
-          const inline =
-            (imgPart as { inline_data?: { mime_type: string; data: string } })
-              ?.inline_data ??
-            (imgPart as { inlineData?: { mimeType: string; data: string } })
-              ?.inlineData;
-          if (inline) {
-            const mt =
-              (inline as { mime_type?: string; mimeType?: string }).mime_type ??
-              (inline as { mimeType?: string }).mimeType ??
-              "image/png";
-            const dataUrl = `data:${mt};base64,${inline.data}`;
-            return new Response(
-              JSON.stringify({
-                imageUrl: dataUrl,
-                fallback: false,
-                provider: "gemini-direct",
-              }),
-              { headers: { ...corsHeaders, "Content-Type": "application/json" } },
-            );
-          }
-          lastGeminiError = `${model}: resposta sem imagem`;
-          console.error("Gemini direct: no image in response", model);
-        } else {
-          const t = await gResp.text();
-          lastGeminiStatus = gResp.status;
-          lastGeminiError = `${model}: ${t.slice(0, 500)}`;
-          console.error("Gemini direct error", model, gResp.status, t.slice(0, 300));
-          if (gResp.status === 429) break;
-        }
-      } catch (err) {
-        lastGeminiError = err instanceof Error ? err.message : "Erro desconhecido no Gemini direto";
-        console.error("Gemini direct exception:", model, err);
-      }
-    }
 
-    return new Response(
-      JSON.stringify({
-        error:
-          lastGeminiStatus === 429
-            ? "A chave Gemini está configurada, mas está sem quota para geração/edição de imagem. Nenhum crédito Lovable foi usado."
-            : "Gemini direto não conseguiu gerar a imagem. Nenhum crédito Lovable foi usado.",
-        provider: "gemini-direct",
-        details: lastGeminiError,
-      }),
-      {
-        status: lastGeminiStatus === 429 ? 429 : 502,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      },
-    );
+        if (!gResp.ok) {
+          const t = await gResp.text();
+          lastGeminiError = `${model}: ${gResp.status}`;
+          console.error("Gemini direct error", model, gResp.status, t.slice(0, 500));
+          continue;
+        }
+
+        const gData = await gResp.json();
+        const parts = gData?.candidates?.[0]?.content?.parts ?? [];
+        const imgPart = parts.find(
+          (p: Record<string, unknown>) =>
+            (p as { inline_data?: unknown }).inline_data ||
+            (p as { inlineData?: unknown }).inlineData,
+        );
+        const inline =
+          (imgPart as { inline_data?: { mime_type?: string; data?: string } })?.inline_data ??
+          (imgPart as { inlineData?: { mimeType?: string; data?: string } })?.inlineData;
+
+        if (!inline?.data) {
+          lastGeminiError = `${model}: sem imagem`;
+          console.error("Gemini direct: no image in response", model, JSON.stringify(gData).slice(0, 500));
+          continue;
+        }
+
+        const mimeType =
+          (inline as { mime_type?: string; mimeType?: string }).mime_type ??
+          (inline as { mimeType?: string }).mimeType ??
+          "image/png";
+
+        return new Response(
+          JSON.stringify({
+            imageUrl: `data:${mimeType};base64,${inline.data}`,
+            fallback: false,
+            provider: "gemini-direct",
+            model,
+          }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        );
+      }
+
+      return await freeImageFallback(
+        `Gemini direto indisponível (${lastGeminiError || "sem resposta"}) — usando geração grátis sem créditos Lovable.`,
+      );
+    } catch (err) {
+      console.error("Gemini direct exception:", err);
+      return await freeImageFallback(
+        "Gemini direto falhou — usando geração grátis sem créditos Lovable.",
+      );
+    }
   } catch (e) {
     console.error("image-combine error:", e);
     return new Response(
