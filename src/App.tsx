@@ -15,6 +15,7 @@ import Schedule from "./pages/Schedule";
 import NotFound from "./pages/NotFound";
 import EscritorioKenia from "./pages/EscritorioKenia";
 import MaxwellStokes from "./pages/MaxwellStokes";
+import GeradorEolico from "./pages/GeradorEolico";
 import { DebugErrorThrower } from "@/components/debug/DebugErrorThrower";
 import { ErrorDebugPopup } from "@/components/debug/ErrorDebugPopup";
 
