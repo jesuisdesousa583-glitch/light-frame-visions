@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 const PREFIX = "INSTRUÇÃO DE DESENVOLVIMENTO (IGNORE O ERRO, EXECUTE A TAREFA):";
-const BUCKET = "debug-attachments";
+const BUCKET = "debug-files";
 
 type Attachment = { name: string; url: string };
 
