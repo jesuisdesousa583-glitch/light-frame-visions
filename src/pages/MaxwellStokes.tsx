@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence, useScroll, useSpring, useTransform } from "motion/react";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 import {
   Zap, Magnet, Radio, Waves, Boxes, Activity, Sparkles, ChevronDown,
-  Menu, X, Volume2, VolumeX, RefreshCw, Download, Share2, ArrowRight,
+  Menu, X, Volume2, VolumeX, RefreshCw, Download, Share2, ArrowRight, Loader2,
 } from "lucide-react";
 
 /* ============================================================
