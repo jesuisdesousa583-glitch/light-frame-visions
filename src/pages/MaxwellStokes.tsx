@@ -554,8 +554,8 @@ function Encerramento() {
           <a href="#hero" className="px-6 py-3 rounded-full font-bold text-black bg-[#00FF88] shadow-[0_0_30px_#00FF88]">
             <RefreshCw className="inline w-4 h-4 mr-2" /> Reiniciar
           </a>
-          <button onClick={() => window.print()} className="px-6 py-3 rounded-full font-bold text-black bg-[#FF1744] shadow-[0_0_30px_#FF1744]">
-            <Download className="inline w-4 h-4 mr-2" /> Salvar PDF
+          <button onClick={() => window.dispatchEvent(new CustomEvent("ms-download-pdf"))} className="px-6 py-3 rounded-full font-bold text-black bg-[#FF1744] shadow-[0_0_30px_#FF1744]">
+            <Download className="inline w-4 h-4 mr-2" /> Baixar PDF
           </button>
           <button
             onClick={() => navigator.share?.({ title: "Maxwell & Stokes", url: window.location.href }).catch(() => {})}
