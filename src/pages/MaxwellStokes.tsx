@@ -597,9 +597,47 @@ export default function MaxwellStokes() {
   const [menu, setMenu] = useState(false);
   const [audio, setAudio] = useState(false);
   const [current, setCurrent] = useState(0);
+  const [downloading, setDownloading] = useState(false);
   const { scrollYProgress } = useScroll();
   const sp = useSpring(scrollYProgress, { stiffness: 80, damping: 20 });
   const barH = useTransform(sp, [0, 1], ["0%", "100%"]);
+
+  const handleDownloadPDF = async () => {
+    if (downloading) return;
+    setDownloading(true);
+    try {
+      const pdf = new jsPDF({ orientation: "landscape", unit: "px", format: [1280, 800] });
+      for (let i = 0; i < SECTIONS.length; i++) {
+        const el = document.getElementById(SECTIONS[i].id);
+        if (!el) continue;
+        el.scrollIntoView({ behavior: "instant" as ScrollBehavior, block: "start" });
+        await new Promise((r) => setTimeout(r, 350));
+        const canvas = await html2canvas(el, {
+          backgroundColor: BG_DARK,
+          scale: 1.5,
+          useCORS: true,
+          logging: false,
+          windowWidth: el.scrollWidth,
+          windowHeight: el.scrollHeight,
+        });
+        const img = canvas.toDataURL("image/jpeg", 0.9);
+        const pw = 1280, ph = 800;
+        const r = Math.min(pw / canvas.width, ph / canvas.height);
+        const w = canvas.width * r, h = canvas.height * r;
+        if (i > 0) pdf.addPage([1280, 800], "landscape");
+        pdf.setFillColor(10, 10, 15);
+        pdf.rect(0, 0, pw, ph, "F");
+        pdf.addImage(img, "JPEG", (pw - w) / 2, (ph - h) / 2, w, h);
+      }
+      pdf.save("maxwell-stokes-ifto.pdf");
+    } catch (e) {
+      console.error(e);
+      alert("Falha ao gerar PDF. Tente novamente.");
+    } finally {
+      setDownloading(false);
+    }
+  };
+
 
   useEffect(() => {
     const onScroll = () => {
