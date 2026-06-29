@@ -80,8 +80,8 @@ export function ErrorDebugPopup() {
           toast.error(`Falha ao enviar ${file.name}: ${error.message}`);
           continue;
         }
-        const { data } = supabase.storage.from(BUCKET).getPublicUrl(path);
-        uploaded.push({ name: file.name, url: data.publicUrl });
+        const { data: signed } = await supabase.storage.from(BUCKET).createSignedUrl(path, 60 * 60 * 24 * 365);
+        uploaded.push({ name: file.name, url: signed?.signedUrl ?? "" });
       }
       if (uploaded.length) {
         setAttachments((prev) => [...prev, ...uploaded]);
