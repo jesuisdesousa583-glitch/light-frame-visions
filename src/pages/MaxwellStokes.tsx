@@ -653,6 +653,13 @@ export default function MaxwellStokes() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  useEffect(() => {
+    const h = () => handleDownloadPDF();
+    window.addEventListener("ms-download-pdf", h);
+    return () => window.removeEventListener("ms-download-pdf", h);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [downloading]);
+
   return (
     <>
       <style>{`
