@@ -687,6 +687,14 @@ export default function MaxwellStokes() {
           <Menu className="w-5 h-5" />
         </button>
 
+        {/* Botão download PDF */}
+        <button onClick={handleDownloadPDF} disabled={downloading}
+          className="fixed top-6 right-20 z-40 h-12 px-4 rounded-full border border-[#FF1744]/60 bg-black/40 backdrop-blur-md flex items-center gap-2 text-[#FF1744] hover:bg-[#FF1744]/10 disabled:opacity-60 font-mono text-xs"
+          aria-label="Baixar apresentação em PDF">
+          {downloading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+          {downloading ? "Gerando..." : "PDF"}
+        </button>
+
         {/* Botão áudio */}
         <button onClick={() => setAudio(!audio)}
           className={`fixed bottom-6 right-6 z-40 w-12 h-12 rounded-full border border-[#FF1744]/50 bg-black/40 backdrop-blur-md flex items-center justify-center text-[#FF1744] hover:bg-[#FF1744]/10 ${audio ? "animate-spin" : ""}`}
