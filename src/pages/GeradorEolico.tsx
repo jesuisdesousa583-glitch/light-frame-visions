@@ -369,8 +369,8 @@ function Etapas() {
       </div>
       <div className="grid md:grid-cols-[1fr_auto_1fr_auto_1fr] items-stretch gap-4">
         {etapas.map((e, i) => (
-          <>
-            <TiltCard key={e.tag} glow={e.color}>
+          <Fragment key={e.tag}>
+            <TiltCard glow={e.color}>
               <Glass className="p-8 text-center h-full flex flex-col items-center justify-center gap-4">
                 <div className="w-20 h-20 rounded-2xl flex items-center justify-center" style={{ background: `${e.color}20`, border: `2px solid ${e.color}` }}>
                   <e.icon className="w-10 h-10" style={{ color: e.color }} />
@@ -380,11 +380,11 @@ function Etapas() {
               </Glass>
             </TiltCard>
             {i < etapas.length - 1 && (
-              <div key={`a-${i}`} className="hidden md:flex items-center justify-center text-[#00E5FF]">
+              <div className="hidden md:flex items-center justify-center text-[#00E5FF]">
                 <ArrowRight className="w-8 h-8 animate-pulse" />
               </div>
             )}
-          </>
+          </Fragment>
         ))}
       </div>
     </Section>
