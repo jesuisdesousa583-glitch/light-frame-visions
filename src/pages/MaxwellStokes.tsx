@@ -1,8 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence, useScroll, useSpring, useTransform } from "motion/react";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
 import {
   Zap, Magnet, Radio, Waves, Boxes, Activity, Sparkles, ChevronDown,
-  Menu, X, Volume2, VolumeX, RefreshCw, Download, Share2, ArrowRight,
+  Menu, X, Volume2, VolumeX, RefreshCw, Download, Share2, ArrowRight, Loader2,
 } from "lucide-react";
 
 /* ============================================================
@@ -552,8 +554,8 @@ function Encerramento() {
           <a href="#hero" className="px-6 py-3 rounded-full font-bold text-black bg-[#00FF88] shadow-[0_0_30px_#00FF88]">
             <RefreshCw className="inline w-4 h-4 mr-2" /> Reiniciar
           </a>
-          <button onClick={() => window.print()} className="px-6 py-3 rounded-full font-bold text-black bg-[#FF1744] shadow-[0_0_30px_#FF1744]">
-            <Download className="inline w-4 h-4 mr-2" /> Salvar PDF
+          <button onClick={() => window.dispatchEvent(new CustomEvent("ms-download-pdf"))} className="px-6 py-3 rounded-full font-bold text-black bg-[#FF1744] shadow-[0_0_30px_#FF1744]">
+            <Download className="inline w-4 h-4 mr-2" /> Baixar PDF
           </button>
           <button
             onClick={() => navigator.share?.({ title: "Maxwell & Stokes", url: window.location.href }).catch(() => {})}
@@ -595,9 +597,47 @@ export default function MaxwellStokes() {
   const [menu, setMenu] = useState(false);
   const [audio, setAudio] = useState(false);
   const [current, setCurrent] = useState(0);
+  const [downloading, setDownloading] = useState(false);
   const { scrollYProgress } = useScroll();
   const sp = useSpring(scrollYProgress, { stiffness: 80, damping: 20 });
   const barH = useTransform(sp, [0, 1], ["0%", "100%"]);
+
+  const handleDownloadPDF = async () => {
+    if (downloading) return;
+    setDownloading(true);
+    try {
+      const pdf = new jsPDF({ orientation: "landscape", unit: "px", format: [1280, 800] });
+      for (let i = 0; i < SECTIONS.length; i++) {
+        const el = document.getElementById(SECTIONS[i].id);
+        if (!el) continue;
+        el.scrollIntoView({ behavior: "instant" as ScrollBehavior, block: "start" });
+        await new Promise((r) => setTimeout(r, 350));
+        const canvas = await html2canvas(el, {
+          backgroundColor: BG_DARK,
+          scale: 1.5,
+          useCORS: true,
+          logging: false,
+          windowWidth: el.scrollWidth,
+          windowHeight: el.scrollHeight,
+        });
+        const img = canvas.toDataURL("image/jpeg", 0.9);
+        const pw = 1280, ph = 800;
+        const r = Math.min(pw / canvas.width, ph / canvas.height);
+        const w = canvas.width * r, h = canvas.height * r;
+        if (i > 0) pdf.addPage([1280, 800], "landscape");
+        pdf.setFillColor(10, 10, 15);
+        pdf.rect(0, 0, pw, ph, "F");
+        pdf.addImage(img, "JPEG", (pw - w) / 2, (ph - h) / 2, w, h);
+      }
+      pdf.save("maxwell-stokes-ifto.pdf");
+    } catch (e) {
+      console.error(e);
+      alert("Falha ao gerar PDF. Tente novamente.");
+    } finally {
+      setDownloading(false);
+    }
+  };
+
 
   useEffect(() => {
     const onScroll = () => {
@@ -612,6 +652,13 @@ export default function MaxwellStokes() {
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  useEffect(() => {
+    const h = () => handleDownloadPDF();
+    window.addEventListener("ms-download-pdf", h);
+    return () => window.removeEventListener("ms-download-pdf", h);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [downloading]);
 
   return (
     <>
@@ -638,6 +685,14 @@ export default function MaxwellStokes() {
           className="fixed top-6 right-6 z-40 w-12 h-12 rounded-full border border-[#00FF88]/50 bg-black/40 backdrop-blur-md flex items-center justify-center text-[#00FF88] hover:bg-[#00FF88]/10"
           aria-label="Abrir menu">
           <Menu className="w-5 h-5" />
+        </button>
+
+        {/* Botão download PDF */}
+        <button onClick={handleDownloadPDF} disabled={downloading}
+          className="fixed top-6 right-20 z-40 h-12 px-4 rounded-full border border-[#FF1744]/60 bg-black/40 backdrop-blur-md flex items-center gap-2 text-[#FF1744] hover:bg-[#FF1744]/10 disabled:opacity-60 font-mono text-xs"
+          aria-label="Baixar apresentação em PDF">
+          {downloading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
+          {downloading ? "Gerando..." : "PDF"}
         </button>
 
         {/* Botão áudio */}
