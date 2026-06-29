@@ -41,6 +41,7 @@ const App = () => (
             <Route path="/image-gen" element={<ImageGen />} />
             <Route path="/schedule" element={<Schedule />} />
             <Route path="/escritorio-kenia" element={<EscritorioKenia />} />
+            <Route path="/maxwell-stokes" element={<MaxwellStokes />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
