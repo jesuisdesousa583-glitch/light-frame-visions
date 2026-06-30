@@ -1,9 +1,18 @@
 import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
-import { ChevronLeft, ChevronRight, Home, Tv, Smartphone, Radio } from "lucide-react";
+import { ChevronLeft, ChevronRight, Home } from "lucide-react";
 import cloudsTaupe from "@/assets/clouds-taupe.jpg";
 import stokesPortrait from "@/assets/stokes-portrait.webp";
 import vectorField from "@/assets/vector-field.webp";
+import vintageTv from "@/assets/vintage-tv.jpg";
+import vintageRadio from "@/assets/vintage-radio.jpg";
+import smartphoneImg from "@/assets/smartphone.jpg";
+import faradayCoil from "@/assets/faraday-coil.jpg";
+import ampereCoil from "@/assets/ampere-coil.jpg";
+import antennaWaves from "@/assets/antenna-waves.jpg";
+import circulationLoop from "@/assets/circulation-loop.jpg";
+import curlVortex from "@/assets/curl-vortex.jpg";
+import stokesSurface from "@/assets/stokes-surface.jpg";
 
 /**
  * Clone do estilo da apresentação "Equações de Maxwell e Teorema de Gauss"
@@ -95,19 +104,13 @@ const SlideCover = () => (
         </div>
       </div>
       <div className="flex h-full items-center justify-center">
-        <div className="relative h-[900px] w-full border border-stone-400 bg-[#f5f1e8] p-4 shadow-2xl">
+        <div className="relative h-full w-full border border-stone-400 bg-[#f5f1e8] p-3 shadow-2xl">
           <img
             src={stokesPortrait}
             alt="Retrato de referência usado no slide"
             className="h-full w-full object-cover"
           />
-          <img
-            src={cloudsTaupe}
-            alt=""
-            aria-hidden="true"
-            className="pointer-events-none absolute -bottom-12 -left-24 h-[240px] w-[560px] object-cover opacity-70 mix-blend-screen"
-          />
-          <div className="absolute inset-x-4 bottom-4 bg-[#f5f1e8]/90 py-2 text-center text-sm font-bold uppercase tracking-wider text-stone-800">
+          <div className="absolute inset-x-3 bottom-3 bg-[#f5f1e8]/90 py-2 text-center text-sm font-bold uppercase tracking-wider text-stone-800">
             Stokes • Faraday • Maxwell
           </div>
         </div>
@@ -128,7 +131,7 @@ const SlideSumario = () => {
       <div className="mb-2 text-[18px] uppercase tracking-[0.4em] text-stone-600">motivação</div>
       <h2 className="text-[54px] font-black leading-tight">Por que estudar Stokes?</h2>
       <Divider />
-      <ul className="space-y-4 pt-4 text-[26px] leading-relaxed">
+      <ul className="space-y-2 pt-3 text-[22px] leading-snug">
         {items.map((it, i) => (
           <li key={i} className="flex items-start gap-4">
             <span className="mt-3 inline-block h-3 w-3 shrink-0 rounded-full bg-stone-800" />
@@ -136,18 +139,23 @@ const SlideSumario = () => {
           </li>
         ))}
       </ul>
-      <div className="mt-8 grid grid-cols-3 gap-6">
+      <div className="mt-6 grid grid-cols-3 gap-4">
         {[
-          { Icon: Tv, label: "Televisão" },
-          { Icon: Smartphone, label: "Celular" },
-          { Icon: Radio, label: "Rádio" },
-        ].map(({ Icon, label }) => (
+          { img: vintageTv, label: "Televisão" },
+          { img: smartphoneImg, label: "Celular" },
+          { img: vintageRadio, label: "Rádio" },
+        ].map(({ img, label }) => (
           <div
             key={label}
-            className="flex flex-col items-center gap-3 rounded-md border-2 border-stone-700 bg-stone-100/60 py-5"
+            className="flex flex-col items-center gap-1 rounded-md border-2 border-stone-700 bg-stone-100/60 p-2"
           >
-            <Icon className="h-16 w-16 text-stone-800" strokeWidth={1.5} />
-            <span className="text-[20px] font-bold uppercase tracking-wider text-stone-800">
+            <img
+              src={img}
+              alt={label}
+              className="h-20 w-full object-contain"
+              loading="lazy"
+            />
+            <span className="text-[16px] font-bold uppercase tracking-wider text-stone-800">
               {label}
             </span>
           </div>
@@ -236,26 +244,8 @@ const SlideCirculacao = () => (
           Se Γ ≠ 0, o campo possui componente rotacional ao longo de C.
         </p>
       </div>
-      <div className="flex items-center justify-center border border-stone-400 bg-stone-100 p-6">
-        <svg viewBox="0 0 220 220" className="h-[320px] w-[320px]">
-          <ellipse cx="110" cy="110" rx="85" ry="60" fill="none" stroke="#1a1812" strokeWidth="2.5" />
-          <polygon points="195,108 185,102 185,114" fill="#1a1812" />
-          <text x="200" y="100" fontSize="14" fill="#1a1812">C</text>
-          {[0, 60, 120, 180, 240, 300].map((a) => {
-            const r = (a * Math.PI) / 180;
-            const x = 110 + 85 * Math.cos(r);
-            const y = 110 + 60 * Math.sin(r);
-            const tx = x - 15 * Math.sin(r);
-            const ty = y + 15 * Math.cos(r);
-            return <line key={a} x1={x} y1={y} x2={tx} y2={ty} stroke="#1a1812" strokeWidth="1.8" markerEnd="url(#ah)" />;
-          })}
-          <defs>
-            <marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
-              <path d="M0,0 L10,5 L0,10 z" fill="#1a1812" />
-            </marker>
-          </defs>
-          <text x="100" y="115" fontSize="16" fontStyle="italic" fill="#1a1812">F⃗</text>
-        </svg>
+      <div className="flex items-center justify-center border border-stone-400 bg-stone-100 p-3">
+        <img src={circulationLoop} alt="Curva fechada com circulação" className="h-full w-full object-contain" loading="lazy" />
       </div>
     </div>
   </Frame>
@@ -283,13 +273,14 @@ const SlideRotacional = () => (
         <Pill>Interpretação Geométrica</Pill>
         <div className="mt-3 border border-stone-700 bg-stone-100 p-2">
           <img
-            src={vectorField}
-            alt="Campo vetorial — visualização de vetores tangentes e rotação local"
+            src={curlVortex}
+            alt="Vórtice — rotacional concentrado"
             className="h-auto w-full object-contain"
+            loading="lazy"
           />
         </div>
         <p className="mt-2 text-center text-[17px] italic">
-          Exemplo de campo vetorial: cada seta representa F⃗(x,y,z) em um ponto do espaço.
+          Vórtice: setas circulando em torno de um eixo ilustram ∇ × F⃗ ≠ 0.
         </p>
       </div>
       <div>
@@ -351,22 +342,10 @@ const SlideStokes = () => (
       </div>
       <div>
         <Pill>Ilustração Geométrica</Pill>
-        <svg viewBox="0 0 260 220" className="mt-2 w-full">
-          <path d="M30 140 Q130 40 230 140 Q170 180 130 150 Q90 180 30 140 Z"
-            fill="none" stroke="#1a1a1a" strokeWidth="1.5" />
-          <path d="M30 140 Q130 200 230 140" fill="none" stroke="#1a1a1a" strokeDasharray="3 3" />
-          <path d="M60 130 a40 40 0 1 0 60 0" fill="none" stroke="#1a1a1a" />
-          <polygon points="118,135 125,128 122,140" fill="#1a1a1a" />
-          <text x="135" y="100" fontSize="14" fontStyle="italic">S</text>
-          <text x="40" y="160" fontSize="12" fontStyle="italic">∂S</text>
-          <line x1="155" y1="110" x2="180" y2="80" stroke="#1a1a1a" markerEnd="url(#arr2)" />
-          <text x="183" y="78" fontSize="11">n̂</text>
-          <defs>
-            <marker id="arr2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
-              <path d="M0,0 L6,3 L0,6 z" fill="#1a1a1a" />
-            </marker>
-          </defs>
-        </svg>
+        <div className="mt-2 border border-stone-700 bg-stone-100 p-2">
+          <img src={stokesSurface} alt="Superfície S limitada por ∂S" className="h-auto w-full object-contain" loading="lazy" />
+        </div>
+        <p className="mt-1 text-center text-[15px] italic">Superfície S limitada pela curva ∂S</p>
       </div>
       <div>
         <Pill>Condições</Pill>
@@ -410,18 +389,14 @@ const SlideFaraday = () => (
       </div>
       <div>
         <Pill>Interpretação Física</Pill>
-        <ul className="mt-3 list-disc space-y-2 pl-5 text-[18px]">
-          <li>Campos magnéticos variáveis geram campos elétricos rotacionais.</li>
-          <li>O sinal negativo expressa a <b>Lei de Lenz</b>: a corrente
-            induzida se opõe à variação que a originou.</li>
-          <li>Princípio de funcionamento de <b>geradores, transformadores,
-            dínamos e indutores</b>.</li>
-        </ul>
-        <div className="mt-4 border border-stone-700 bg-stone-100 p-3 text-[17px]">
-          <b>Importante:</b> Stokes é a ponte matemática que transforma a
-          forma global (integral) na forma local (diferencial) das equações
-          de Maxwell.
+        <div className="mt-3 border border-stone-700 bg-stone-100 p-2">
+          <img src={faradayCoil} alt="Bobina de indução de Faraday" className="h-44 w-full object-contain" loading="lazy" />
         </div>
+        <ul className="mt-3 list-disc space-y-1 pl-5 text-[17px]">
+          <li>Campos magnéticos variáveis geram campos elétricos rotacionais.</li>
+          <li>Sinal negativo = <b>Lei de Lenz</b>.</li>
+          <li>Base de <b>geradores, transformadores e dínamos</b>.</li>
+        </ul>
       </div>
     </div>
   </Frame>
@@ -449,16 +424,13 @@ const SlideAmpere = () => (
       </div>
       <div>
         <Pill>Aplicação do Teorema de Stokes</Pill>
-        <p className="mt-3 text-[18px]">
-          Partindo da forma integral e aplicando Stokes ao lado esquerdo:
-        </p>
-        <div className="mt-3 space-y-2 border border-stone-700 p-3 text-[18px]">
+        <div className="mt-2 border border-stone-700 bg-stone-100 p-2">
+          <img src={ampereCoil} alt="Solenoide — Lei de Ampère" className="h-40 w-full object-contain" loading="lazy" />
+        </div>
+        <div className="mt-3 space-y-1 border border-stone-700 p-3 text-[17px]">
           <p>∮<sub>C</sub> B⃗ · dr⃗ = ∬<sub>S</sub> (∇ × B⃗) · dS⃗</p>
-          <p>⇒ ∬<sub>S</sub> (∇ × B⃗) · dS⃗ = ∬<sub>S</sub> (μ₀J⃗ + μ₀ε₀ ∂E⃗/∂t) · dS⃗</p>
-          <p>Como vale para toda superfície <i>S</i>:</p>
-          <p className="text-center font-bold">
-            ∇ × B⃗ = μ₀ J⃗ + μ₀ε₀ ∂E⃗/∂t
-          </p>
+          <p>Vale para toda <i>S</i> ⇒</p>
+          <p className="text-center font-bold">∇ × B⃗ = μ₀ J⃗ + μ₀ε₀ ∂E⃗/∂t</p>
         </div>
       </div>
     </div>
@@ -635,24 +607,28 @@ const SlideConclusao = () => (
   <Frame>
     <h2 className="text-center text-[54px] font-black">Conclusão</h2>
     <Divider />
-    <div className="mx-auto max-w-3xl pt-6 text-[21px] leading-relaxed">
-      <p>
-        O <b>Teorema de Stokes</b> é a ferramenta central do Cálculo Vetorial
-        que conecta a circulação de um campo ao longo de uma curva fechada
-        com o fluxo de seu rotacional através de qualquer superfície limitada
-        por essa curva.
-      </p>
-      <p className="mt-4">
-        No eletromagnetismo, ele permite passar das formas <b>integrais</b>
-        (globais) para as formas <b>diferenciais</b> (locais) das equações de
-        Maxwell — em particular das leis de <b>Faraday–Lenz</b> e
-        <b> Ampère–Maxwell</b> — revelando que campos elétricos e magnéticos
-        variáveis se geram mutuamente, dando origem às ondas eletromagnéticas.
-      </p>
-      <p className="mt-6 text-center italic">
-        "A matemática é a linguagem na qual Deus escreveu o universo."
-        <br />— Galileu Galilei
-      </p>
+    <div className="grid grid-cols-[1.2fr_1fr] gap-8 pt-4">
+      <div className="text-[19px] leading-relaxed">
+        <p>
+          O <b>Teorema de Stokes</b> conecta a circulação de um campo ao longo
+          de uma curva fechada com o fluxo de seu rotacional através de qualquer
+          superfície limitada por ela.
+        </p>
+        <p className="mt-3">
+          No eletromagnetismo, permite passar das formas <b>integrais</b>
+          para as formas <b>diferenciais</b> das equações de Maxwell —
+          em particular <b>Faraday–Lenz</b> e <b>Ampère–Maxwell</b> —
+          dando origem às ondas eletromagnéticas que sustentam rádio, TV
+          e telecomunicações.
+        </p>
+        <p className="mt-4 italic">
+          "A matemática é a linguagem na qual Deus escreveu o universo."
+          <br />— Galileu Galilei
+        </p>
+      </div>
+      <div className="border border-stone-700 bg-stone-100 p-3">
+        <img src={antennaWaves} alt="Torre de antena emitindo ondas eletromagnéticas" className="h-full w-full object-contain" loading="lazy" />
+      </div>
     </div>
   </Frame>
 );
