@@ -100,7 +100,7 @@ const SlideCover = () => (
           <img
             src={maxwellEngraving}
             alt="Gravura acadêmica em estilo vintage usada como imagem de referência do slide Genially"
-            className="h-full w-full object-cover grayscale"
+            className="h-full w-full object-cover"
           />
           <img
             src={cloudsTaupe}
