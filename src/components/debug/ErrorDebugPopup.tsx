@@ -18,6 +18,8 @@ export function ErrorDebugPopup() {
       (window.location.hostname.includes("lovable.app") ||
         window.location.hostname.includes("lovableproject.com") ||
         window.location.hostname === "localhost"));
+  const isPrintExport =
+    typeof window !== "undefined" && new URLSearchParams(window.location.search).has("print");
 
   const isAdmin = isDev;
 
@@ -54,7 +56,7 @@ export function ErrorDebugPopup() {
     };
   }, []);
 
-  if (!isAdmin || !open) return null;
+  if (!isAdmin || isPrintExport || !open) return null;
 
   const startDrag = (e: ReactMouseEvent<HTMLDivElement>) => {
     const rect = containerRef.current?.getBoundingClientRect();
@@ -117,6 +119,7 @@ export function ErrorDebugPopup() {
 
   return (
     <div
+      data-debug-tool="true"
       ref={containerRef}
       style={{
         position: "fixed",
