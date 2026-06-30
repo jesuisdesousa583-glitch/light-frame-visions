@@ -2,7 +2,8 @@ import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { ChevronLeft, ChevronRight, Home } from "lucide-react";
 import cloudsTaupe from "@/assets/clouds-taupe.jpg";
-import maxwellEngraving from "@/assets/maxwell-engraving.jpg";
+import stokesPortraitAsset from "@/assets/stokes-portrait.webp.asset.json";
+const maxwellEngraving = stokesPortraitAsset.url;
 
 /**
  * Clone do estilo da apresentação "Equações de Maxwell e Teorema de Gauss"
@@ -99,7 +100,7 @@ const SlideCover = () => (
           <img
             src={maxwellEngraving}
             alt="Gravura acadêmica em estilo vintage usada como imagem de referência do slide Genially"
-            className="h-full w-full object-cover grayscale"
+            className="h-full w-full object-cover"
           />
           <img
             src={cloudsTaupe}
