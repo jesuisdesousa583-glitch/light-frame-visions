@@ -658,7 +658,6 @@ const SlideReferencias = () => (
 const slides = [
   SlideCover,
   SlideSumario,
-  SlideHistorico,
   SlideCampoVetorial,
   SlideCirculacao,
   SlideRotacional,
@@ -668,10 +667,7 @@ const slides = [
   SlideStokesFaraday,
   SlideAmpere,
   SlideAplicacaoTeorema,
-  SlideAplicacao,
-  SlideAplicacoesEng,
   SlideConclusao,
-  SlideReferencias,
 ];
 
 export default function GuilhermeStokes() {
