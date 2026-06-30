@@ -84,59 +84,7 @@ const MAXWELL_VIDEO_WEBM_URL = "/videos/maxwell.webm";
 const MAXWELL_VIDEO_MP4_URL = "/videos/maxwell.mp4";
 const MAXWELL_VIDEO_POSTER_URL = "/videos/maxwell-poster.jpg";
 
-const MaxwellVideo = ({ active, isPrint }: { active: boolean; isPrint: boolean }) => {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [status, setStatus] = useState<"idle" | "loading" | "ready" | "playing" | "error">(
-    active ? "loading" : "idle",
-  );
-
-  const playVideo = useCallback(async () => {
-    const video = videoRef.current;
-    if (!video || isPrint) return;
-    try {
-      video.muted = true;
-      video.loop = true;
-      video.playsInline = true;
-      await video.play();
-      setStatus("playing");
-    } catch {
-      setStatus("ready");
-    }
-  }, [isPrint]);
-
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!active || !video || isPrint) return;
-
-    let cancelled = false;
-    setStatus("loading");
-
-    const markReady = () => {
-      if (cancelled) return;
-      setStatus("ready");
-      playVideo();
-    };
-
-    const markError = () => {
-      if (!cancelled) setStatus("error");
-    };
-
-    video.addEventListener("loadeddata", markReady, { once: true });
-    video.addEventListener("canplay", markReady, { once: true });
-    video.addEventListener("error", markError);
-    video.load();
-
-    if (video.readyState >= 2) markReady();
-
-    return () => {
-      cancelled = true;
-      video.pause();
-      video.removeEventListener("loadeddata", markReady);
-      video.removeEventListener("canplay", markReady);
-      video.removeEventListener("error", markError);
-    };
-  }, [active, isPrint, playVideo]);
-
+const MaxwellVideo = ({ isPrint }: { active: boolean; isPrint: boolean }) => {
   if (isPrint) {
     return (
       <img
@@ -148,42 +96,18 @@ const MaxwellVideo = ({ active, isPrint }: { active: boolean; isPrint: boolean }
   }
 
   return (
-    <div className="relative h-full w-full overflow-hidden bg-stone-200">
-      <video
-        ref={videoRef}
-        className="h-full w-full object-cover"
-        poster={MAXWELL_VIDEO_POSTER_URL}
-        muted
-        loop
-        playsInline
-        controls
-        preload="auto"
-        onPlay={() => setStatus("playing")}
-        onPause={() => setStatus((current) => (current === "playing" ? "ready" : current))}
-      >
-        <source src={MAXWELL_VIDEO_WEBM_URL} type="video/webm" />
-        <source src={MAXWELL_VIDEO_MP4_URL} type="video/mp4" />
-      </video>
-
-      {status === "loading" && active && (
-        <div className="absolute inset-0 flex items-center justify-center bg-[#f5f1e8]/80 text-stone-800">
-          <Loader2 className="h-10 w-10 animate-spin" />
-        </div>
-      )}
-
-      {(status === "ready" || status === "error") && active && (
-        <button
-          type="button"
-          onClick={playVideo}
-          className="absolute inset-0 flex items-center justify-center bg-[#f5f1e8]/35 text-stone-900 transition hover:bg-[#f5f1e8]/20"
-          aria-label="Reproduzir vídeo"
-        >
-          <span className="flex h-20 w-20 items-center justify-center rounded-full border-2 border-stone-900 bg-[#f5f1e8]/90 shadow-lg">
-            <Play className="ml-1 h-9 w-9 fill-current" />
-          </span>
-        </button>
-      )}
-    </div>
+    <video
+      key="maxwell-video"
+      className="h-full w-full object-cover bg-stone-200"
+      poster={MAXWELL_VIDEO_POSTER_URL}
+      src={MAXWELL_VIDEO_MP4_URL}
+      autoPlay
+      muted
+      loop
+      playsInline
+      controls
+      preload="auto"
+    />
   );
 };
 
