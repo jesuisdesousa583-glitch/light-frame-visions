@@ -77,25 +77,25 @@ const SlideCover = () => (
       alt="Nuvens em tom sépia usadas como referência visual do Genially"
       className="pointer-events-none absolute left-0 top-0 h-full w-full object-cover opacity-25 mix-blend-multiply"
     />
-    <div className="grid h-full grid-cols-[0.85fr_1.15fr] items-center gap-10">
+    <div className="grid h-full grid-cols-2 items-center gap-8">
       <div>
-        <h1 className="font-serif text-[52px] font-black uppercase leading-[1.05] tracking-tight">
+        <h1 className="font-serif text-[48px] font-black uppercase leading-[1.05] tracking-tight">
           Teorema de Stokes
           <br />e Rotacional
         </h1>
         <Pill>Disciplina: Cálculo III</Pill>
-        <div className="mt-14 space-y-1 text-base">
+        <div className="mt-12 space-y-1 text-base">
           <p className="text-stone-700">Prof: Daniel Yoshio Akamatsu</p>
           <p className="font-bold">Instituto Federal de Goiás — Campus Jataí</p>
         </div>
-        <div className="mt-10 space-y-0.5 text-base">
+        <div className="mt-8 space-y-0.5 text-base">
           <p>Alunos: Ana Beatriz Lima</p>
           <p className="ml-12">Pedro Henrique Souza</p>
           <p className="ml-12">Larissa Oliveira</p>
         </div>
       </div>
       <div className="flex h-full items-center justify-center">
-        <div className="relative h-[620px] w-[520px] border border-stone-400 bg-stone-200 p-4 shadow-2xl">
+        <div className="relative h-[760px] w-full max-w-[640px] border border-stone-400 bg-stone-200 p-4 shadow-2xl">
           <img
             src={stokesPortrait}
             alt="Retrato de referência usado no slide"
