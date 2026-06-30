@@ -16,6 +16,9 @@ const Index = () => {
           <Link to="/genially-maxwell" className="inline-block rounded-lg bg-[#A89F86] px-6 py-3 font-serif text-white hover:opacity-90">
             ☁️ Maxwell &amp; Stokes — Cálculo 3 (Genially) →
           </Link>
+          <Link to="/guilherme-stokes" className="inline-block rounded-lg bg-stone-900 px-6 py-3 font-serif text-stone-50 hover:opacity-90">
+            📜 Stokes &amp; Rotacional — Estilo Guilherme (IFG Jataí) →
+          </Link>
         </div>
       </div>
     </div>
