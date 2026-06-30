@@ -4,9 +4,9 @@ import { ChevronLeft, ChevronRight, Home } from "lucide-react";
 import maxwellPortrait from "@/assets/maxwell-engraving.jpg";
 import cloudsBg from "@/assets/clouds-taupe.jpg";
 
-const TAUPE = "#A89F86";
-const CREAM = "#F5EFE2";
-const INK = "#2B2A26";
+const TAUPE = "#8C8268";
+const CREAM = "#FBF6EA";
+const INK = "#1A1916";
 
 const slides = [
   {
