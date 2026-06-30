@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
-import { ChevronLeft, ChevronRight, Home } from "lucide-react";
+import { ChevronLeft, ChevronRight, Home, Tv, Smartphone, Radio } from "lucide-react";
 import cloudsTaupe from "@/assets/clouds-taupe.jpg";
 import stokesPortrait from "@/assets/stokes-portrait.webp";
 import vectorField from "@/assets/vector-field.webp";
@@ -128,7 +128,7 @@ const SlideSumario = () => {
       <div className="mb-2 text-[18px] uppercase tracking-[0.4em] text-stone-600">motivação</div>
       <h2 className="text-[54px] font-black leading-tight">Por que estudar Stokes?</h2>
       <Divider />
-      <ul className="space-y-5 pt-6 text-[26px] leading-relaxed">
+      <ul className="space-y-4 pt-4 text-[26px] leading-relaxed">
         {items.map((it, i) => (
           <li key={i} className="flex items-start gap-4">
             <span className="mt-3 inline-block h-3 w-3 shrink-0 rounded-full bg-stone-800" />
@@ -136,6 +136,23 @@ const SlideSumario = () => {
           </li>
         ))}
       </ul>
+      <div className="mt-8 grid grid-cols-3 gap-6">
+        {[
+          { Icon: Tv, label: "Televisão" },
+          { Icon: Smartphone, label: "Celular" },
+          { Icon: Radio, label: "Rádio" },
+        ].map(({ Icon, label }) => (
+          <div
+            key={label}
+            className="flex flex-col items-center gap-3 rounded-md border-2 border-stone-700 bg-stone-100/60 py-5"
+          >
+            <Icon className="h-16 w-16 text-stone-800" strokeWidth={1.5} />
+            <span className="text-[20px] font-bold uppercase tracking-wider text-stone-800">
+              {label}
+            </span>
+          </div>
+        ))}
+      </div>
     </Frame>
   );
 };
