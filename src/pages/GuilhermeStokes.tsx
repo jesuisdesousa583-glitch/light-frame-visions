@@ -95,7 +95,7 @@ const SlideCover = () => (
         </div>
       </div>
       <div className="flex h-full items-center justify-center">
-        <div className="relative h-[760px] w-full max-w-[640px] border border-stone-400 bg-stone-200 p-4 shadow-2xl">
+        <div className="relative h-[900px] w-full border border-stone-400 bg-[#f5f1e8] p-4 shadow-2xl">
           <img
             src={stokesPortrait}
             alt="Retrato de referência usado no slide"
@@ -105,9 +105,9 @@ const SlideCover = () => (
             src={cloudsTaupe}
             alt=""
             aria-hidden="true"
-            className="pointer-events-none absolute -bottom-12 -left-24 h-[200px] w-[480px] object-cover opacity-70 mix-blend-screen"
+            className="pointer-events-none absolute -bottom-12 -left-24 h-[240px] w-[560px] object-cover opacity-70 mix-blend-screen"
           />
-          <div className="absolute inset-x-4 bottom-4 bg-stone-100/85 py-1.5 text-center text-xs font-bold uppercase tracking-wider text-stone-800">
+          <div className="absolute inset-x-4 bottom-4 bg-[#f5f1e8]/90 py-2 text-center text-sm font-bold uppercase tracking-wider text-stone-800">
             Stokes • Faraday • Maxwell
           </div>
         </div>
