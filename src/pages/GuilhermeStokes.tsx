@@ -610,6 +610,7 @@ const slides = [
   SlideStokes,
   SlideFaraday,
   SlideAmpere,
+  SlideAplicacaoTeorema,
   SlideAplicacao,
   SlideAplicacoesEng,
   SlideConclusao,
