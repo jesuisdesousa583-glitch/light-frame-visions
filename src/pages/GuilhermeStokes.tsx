@@ -292,6 +292,27 @@ const SlideRotacional = () => (
   </Frame>
 );
 
+const SlideRotacionalSimbolos = () => (
+  <Frame>
+    <div className="mb-2 text-[18px] uppercase tracking-[0.4em] text-stone-600">Rotacional</div>
+    <h2 className="text-[48px] font-black">Significado dos símbolos</h2>
+    <Divider />
+    <div className="grid grid-cols-[1fr_1fr] gap-10 pt-4">
+      <div className="flex items-center justify-center rounded border border-stone-400 bg-stone-100 p-8">
+        <div className="text-center font-serif text-[56px] leading-tight">
+          ∇ × F⃗
+        </div>
+      </div>
+      <ul className="space-y-4 text-[22px] leading-relaxed">
+        <li><b>∇</b> — operador nabla (derivadas parciais).</li>
+        <li><b>×</b> — produto vetorial.</li>
+        <li><b>F⃗</b> — campo vetorial analisado.</li>
+        <li><b>Resultado:</b> vetor que indica a tendência de rotação local do campo em cada ponto.</li>
+      </ul>
+    </div>
+  </Frame>
+);
+
 const SlideStokes = () => (
   <Frame>
     <h2 className="text-center text-[54px] font-black">Teorema de Stokes</h2>
