@@ -566,6 +566,7 @@ const slides = [
   SlideCampoVetorial,
   SlideCirculacao,
   SlideRotacional,
+  SlideRotacionalSimbolos,
   SlideStokes,
   SlideFaraday,
   SlideAmpere,
