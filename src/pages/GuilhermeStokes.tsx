@@ -65,7 +65,7 @@ const Frame = ({ children }: { children: React.ReactNode }) => (
     <Corner pos="tr" />
     <Corner pos="bl" />
     <Corner pos="br" />
-    <div className="relative z-10 h-full">{children}</div>
+    <div className="relative z-10 h-full" style={{ zoom: 1.15 }}>{children}</div>
   </div>
 );
 
