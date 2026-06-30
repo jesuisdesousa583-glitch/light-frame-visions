@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { Link } from "react-router-dom";
 import { ChevronLeft, ChevronRight, Home } from "lucide-react";
 import cloudsTaupe from "@/assets/clouds-taupe.jpg";
