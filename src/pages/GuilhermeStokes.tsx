@@ -661,6 +661,7 @@ const slides = [
   SlideAmpere,
   SlideAplicacaoTeorema,
   SlideConclusao,
+  SlideReferencias,
 ];
 
 export default function GuilhermeStokes() {
