@@ -197,6 +197,53 @@ const SlideCampoVetorial = () => (
   </Frame>
 );
 
+const SlideCirculacao = () => (
+  <Frame>
+    <h2 className="text-[48px] font-black">Circulação</h2>
+    <Divider />
+    <div className="grid grid-cols-[1.1fr_1fr] gap-10 pt-4">
+      <div className="space-y-5 text-[22px] leading-relaxed">
+        <p>
+          A <b>circulação</b> de um campo vetorial mede o quanto ele "gira" ao longo
+          de uma curva fechada.
+        </p>
+        <div className="rounded border border-stone-400 bg-stone-100 p-6 text-center font-serif text-[36px]">
+          Γ = ∮<sub>C</sub> F⃗ · d r⃗
+        </div>
+        <ul className="list-disc space-y-2 pl-6">
+          <li><b>C:</b> curva fechada (orientada).</li>
+          <li><b>F⃗:</b> campo vetorial avaliado sobre a curva.</li>
+          <li><b>d r⃗:</b> deslocamento infinitesimal tangente a C.</li>
+        </ul>
+        <p className="text-[20px] text-stone-700">
+          Se Γ ≠ 0, o campo possui componente rotacional ao longo de C.
+        </p>
+      </div>
+      <div className="flex items-center justify-center border border-stone-400 bg-stone-100 p-6">
+        <svg viewBox="0 0 220 220" className="h-[320px] w-[320px]">
+          <ellipse cx="110" cy="110" rx="85" ry="60" fill="none" stroke="#1a1812" strokeWidth="2.5" />
+          <polygon points="195,108 185,102 185,114" fill="#1a1812" />
+          <text x="200" y="100" fontSize="14" fill="#1a1812">C</text>
+          {[0, 60, 120, 180, 240, 300].map((a) => {
+            const r = (a * Math.PI) / 180;
+            const x = 110 + 85 * Math.cos(r);
+            const y = 110 + 60 * Math.sin(r);
+            const tx = x - 15 * Math.sin(r);
+            const ty = y + 15 * Math.cos(r);
+            return <line key={a} x1={x} y1={y} x2={tx} y2={ty} stroke="#1a1812" strokeWidth="1.8" markerEnd="url(#ah)" />;
+          })}
+          <defs>
+            <marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+              <path d="M0,0 L10,5 L0,10 z" fill="#1a1812" />
+            </marker>
+          </defs>
+          <text x="100" y="115" fontSize="16" fontStyle="italic" fill="#1a1812">F⃗</text>
+        </svg>
+      </div>
+    </div>
+  </Frame>
+);
+
 const SlideRotacional = () => (
   <Frame>
     <h2 className="text-center text-[50px] font-black">Rotacional de um Campo</h2>
