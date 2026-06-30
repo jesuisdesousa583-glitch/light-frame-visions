@@ -169,6 +169,34 @@ const SlideHistorico = () => (
   </Frame>
 );
 
+const SlideCampoVetorial = () => (
+  <Frame>
+    <h2 className="text-[48px] font-black">O que é um campo vetorial?</h2>
+    <Divider />
+    <div className="grid grid-cols-[1.1fr_1fr] gap-10 pt-4">
+      <div className="space-y-5 text-[22px] leading-relaxed">
+        <p>
+          <b>Campo vetorial:</b> função que associa a cada ponto do espaço um vetor.
+        </p>
+        <div className="rounded border border-stone-400 bg-stone-100 p-5 text-center font-serif text-[34px]">
+          F⃗(x, y, z) = ⟨P, Q, R⟩
+        </div>
+        <ul className="list-disc space-y-2 pl-6">
+          <li><b>Direção:</b> para onde o vetor aponta em cada ponto.</li>
+          <li><b>Sentido:</b> orientação ao longo dessa direção.</li>
+          <li><b>Módulo:</b> intensidade da grandeza no ponto.</li>
+        </ul>
+        <p className="text-[20px] text-stone-700">
+          Exemplos: velocidade de um fluido, campo elétrico E⃗, campo magnético B⃗.
+        </p>
+      </div>
+      <div className="border border-stone-400 bg-stone-100 p-3">
+        <img src={vectorField} alt="Campo vetorial" className="h-full w-full object-contain" />
+      </div>
+    </div>
+  </Frame>
+);
+
 const SlideRotacional = () => (
   <Frame>
     <h2 className="text-center text-[50px] font-black">Rotacional de um Campo</h2>
@@ -467,6 +495,7 @@ const slides = [
   SlideCover,
   SlideSumario,
   SlideHistorico,
+  SlideCampoVetorial,
   SlideRotacional,
   SlideStokes,
   SlideFaraday,
