@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { ChevronLeft, ChevronRight, Home } from "lucide-react";
 import cloudsTaupe from "@/assets/clouds-taupe.jpg";
 import stokesPortrait from "@/assets/stokes-portrait.webp";
+import vectorField from "@/assets/vector-field.webp";
 
 /**
  * Clone do estilo da apresentação "Equações de Maxwell e Teorema de Gauss"
