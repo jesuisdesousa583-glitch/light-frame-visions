@@ -80,44 +80,88 @@ const Frame = ({ children }: { children: React.ReactNode }) => (
 
 // ============== SLIDES ==============
 
-const SlideCover = () => (
-  <Frame>
-    <img
-      src={cloudsTaupe}
-      alt="Nuvens em tom sépia usadas como referência visual do Genially"
-      className="pointer-events-none absolute left-0 top-0 h-full w-full object-cover opacity-25 mix-blend-multiply"
-    />
-    <div className="grid h-full grid-cols-2 items-center gap-8">
-      <div>
-        <h1 className="font-serif text-[42px] font-bold uppercase leading-[1.1] tracking-[0.02em]">
-          Equações de Maxwell
-          <br />e Teorema de Stokes
-        </h1>
-        <Pill>Cálculo 3</Pill>
-        <div className="mt-12 space-y-1 text-base">
-          <p className="text-stone-700">Apresentação por:</p>
-          <p className="font-bold">Giovanna, Erik, Flávio e Reuel</p>
+const MAXWELL_VIDEO_URL =
+  "https://ajwelsrtjunkbzqlxtkb.supabase.co/storage/v1/object/sign/debug-files/1782792831845-putf41-Digen_video_1782792482866.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jYTNiOGMxMS1lNmM4LTQ3MWMtYjZjNS0zY2U2ZGZhMGViMmIiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJkZWJ1Zy1maWxlcy8xNzgyNzkyODMxODQ1LXB1dGY0MS1EaWdlbl92aWRlb18xNzgyNzkyNDgyODY2Lm1wNCIsInNjb3BlIjoiZG93bmxvYWQiLCJpYXQiOjE3ODI3OTI4MzgsImV4cCI6MTgxNDMyODgzOH0.IIXaCaUbbGTlkr6PpKZ6Rr-7KsxXzYXDXiaORC7Jgdc";
+
+const SlideCover = () => {
+  const [showVideo, setShowVideo] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const isPrint =
+    typeof window !== "undefined" && new URLSearchParams(window.location.search).has("print");
+
+  useEffect(() => {
+    if (isPrint) {
+      setShowVideo(true);
+      return;
+    }
+    const t = setTimeout(() => setShowVideo(true), 2000);
+    return () => clearTimeout(t);
+  }, [isPrint]);
+
+  useEffect(() => {
+    if (showVideo && videoRef.current && !isPrint) {
+      videoRef.current.play().catch(() => {});
+    }
+  }, [showVideo, isPrint]);
+
+  return (
+    <Frame>
+      <img
+        src={cloudsTaupe}
+        alt="Nuvens em tom sépia usadas como referência visual do Genially"
+        className="pointer-events-none absolute left-0 top-0 h-full w-full object-cover opacity-25 mix-blend-multiply"
+      />
+      <div className="grid h-full grid-cols-2 items-center gap-8">
+        <div>
+          <h1 className="font-serif text-[42px] font-bold uppercase leading-[1.1] tracking-[0.02em]">
+            Equações de Maxwell
+            <br />e Teorema de Stokes
+          </h1>
+          <Pill>Cálculo 3</Pill>
+          <div className="mt-12 space-y-1 text-base">
+            <p className="text-stone-700">Apresentação por:</p>
+            <p className="font-bold">Giovanna, Erik, Flávio e Reuel</p>
+          </div>
+          <div className="mt-8 space-y-0.5 text-base">
+            <p className="italic text-stone-700">Giovanna Felippe da Silva</p>
+            <p className="text-stone-600">Criado em 25 de junho de 2026</p>
+          </div>
         </div>
-        <div className="mt-8 space-y-0.5 text-base">
-          <p className="italic text-stone-700">Giovanna Felippe da Silva</p>
-          <p className="text-stone-600">Criado em 25 de junho de 2026</p>
-        </div>
-      </div>
-      <div className="flex h-full items-center justify-center">
-        <div className="relative h-full w-full border border-stone-400 bg-[#f5f1e8] p-3 shadow-2xl">
-          <img
-            src={stokesPortrait}
-            alt="Retrato de referência usado no slide"
-            className="h-full w-full object-cover"
-          />
-          <div className="absolute inset-x-3 bottom-3 bg-[#f5f1e8]/90 py-2 text-center text-sm font-bold uppercase tracking-wider text-stone-800">
-            Stokes • Faraday • Maxwell
+        <div className="flex h-full items-center justify-center gap-4">
+          <div className="relative h-full w-1/2 border border-stone-400 bg-[#f5f1e8] p-3 shadow-2xl">
+            <img
+              src={stokesPortrait}
+              alt="Retrato de referência usado no slide"
+              className="h-full w-full object-cover"
+            />
+            <div className="absolute inset-x-3 bottom-3 bg-[#f5f1e8]/90 py-2 text-center text-sm font-bold uppercase tracking-wider text-stone-800">
+              Stokes • Faraday • Maxwell
+            </div>
+          </div>
+          <div
+            className="relative h-full w-1/2 border border-stone-400 bg-[#f5f1e8] p-3 shadow-2xl transition-opacity duration-700"
+            style={{ opacity: showVideo ? 1 : 0 }}
+          >
+            {showVideo && (
+              <video
+                ref={videoRef}
+                src={MAXWELL_VIDEO_URL}
+                className="h-full w-full object-cover"
+                autoPlay
+                muted
+                loop
+                playsInline
+              />
+            )}
+            <div className="absolute inset-x-3 bottom-3 bg-[#f5f1e8]/90 py-2 text-center text-sm font-bold uppercase tracking-wider text-stone-800">
+              Maxwell em movimento
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  </Frame>
-);
+    </Frame>
+  );
+};
 
 const SlideSumario = () => {
   const items = [
