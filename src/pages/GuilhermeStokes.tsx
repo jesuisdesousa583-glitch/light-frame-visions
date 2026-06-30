@@ -131,7 +131,7 @@ const SlideSumario = () => {
       <div className="mb-2 text-[18px] uppercase tracking-[0.4em] text-stone-600">motivação</div>
       <h2 className="text-[54px] font-black leading-tight">Por que estudar Stokes?</h2>
       <Divider />
-      <ul className="space-y-4 pt-4 text-[26px] leading-relaxed">
+      <ul className="space-y-2 pt-3 text-[22px] leading-snug">
         {items.map((it, i) => (
           <li key={i} className="flex items-start gap-4">
             <span className="mt-3 inline-block h-3 w-3 shrink-0 rounded-full bg-stone-800" />
