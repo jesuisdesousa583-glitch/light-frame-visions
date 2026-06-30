@@ -448,6 +448,46 @@ const SlideAmpere = () => (
   </Frame>
 );
 
+const SlideAplicacaoTeorema = () => (
+  <Frame>
+    <h2 className="text-[48px] font-black">Aplicação do Teorema</h2>
+    <Divider />
+    <div className="grid grid-cols-[1fr_1.1fr] gap-10 pt-4">
+      <div className="space-y-4 text-[22px] leading-relaxed">
+        <p className="font-bold">Das 4 Equações de Maxwell:</p>
+        <ul className="space-y-2 pl-2">
+          <li>✓ Lei de Faraday</li>
+          <li>✓ Lei de Ampère–Maxwell</li>
+        </ul>
+        <p>Utilizam <b>diretamente</b> o Teorema de Stokes.</p>
+        <p className="border-l-4 border-stone-700 bg-stone-100 p-4 text-[20px] italic">
+          É ele que permite passar da <b>forma integral</b> para a <b>forma diferencial</b>.
+        </p>
+      </div>
+      <div className="space-y-4">
+        <div className="rounded border border-stone-400 bg-stone-100 p-5">
+          <div className="mb-1 text-[16px] uppercase tracking-widest text-stone-600">Teorema de Stokes</div>
+          <div className="text-center font-serif text-[28px]">
+            ∮<sub>∂S</sub> F⃗ · d r⃗ = ∬<sub>S</sub> (∇ × F⃗) · d S⃗
+          </div>
+        </div>
+        <div className="rounded border border-stone-400 bg-stone-100 p-5">
+          <div className="mb-1 text-[16px] uppercase tracking-widest text-stone-600">Faraday — integral → diferencial</div>
+          <div className="text-center font-serif text-[24px]">
+            ∮<sub>C</sub> E⃗ · d r⃗ = −d/dt ∬<sub>S</sub> B⃗ · d S⃗ &nbsp;⇒&nbsp; ∇ × E⃗ = −∂B⃗/∂t
+          </div>
+        </div>
+        <div className="rounded border border-stone-400 bg-stone-100 p-5">
+          <div className="mb-1 text-[16px] uppercase tracking-widest text-stone-600">Ampère–Maxwell — integral → diferencial</div>
+          <div className="text-center font-serif text-[24px]">
+            ∮<sub>C</sub> B⃗ · d r⃗ = μ₀(I + ε₀ dΦ<sub>E</sub>/dt) &nbsp;⇒&nbsp; ∇ × B⃗ = μ₀J⃗ + μ₀ε₀ ∂E⃗/∂t
+          </div>
+        </div>
+      </div>
+    </div>
+  </Frame>
+);
+
 const SlideAplicacao = () => (
   <Frame>
     <h2 className="text-center text-[46px] font-black">
