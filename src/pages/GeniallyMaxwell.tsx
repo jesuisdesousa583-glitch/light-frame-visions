@@ -293,7 +293,7 @@ export default function GeniallyMaxwell() {
       <div
         className="relative w-full max-w-[1600px] aspect-[16/9] overflow-hidden shadow-2xl"
         style={{
-          background: `url(${cloudsBg}) center/cover, ${TAUPE}`,
+          background: `linear-gradient(${CREAM}E6, ${CREAM}E6), url(${cloudsBg}) center/cover, ${TAUPE}`,
         }}
       >
         <Chrome i={i} n={n} />
