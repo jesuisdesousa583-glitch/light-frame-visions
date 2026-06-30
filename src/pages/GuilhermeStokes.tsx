@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { ChevronLeft, ChevronRight, Home } from "lucide-react";
+import cloudsTaupe from "@/assets/clouds-taupe.jpg";
+import maxwellEngraving from "@/assets/maxwell-engraving.jpg";
 
 /**
  * Clone do estilo da apresentação "Equações de Maxwell e Teorema de Gauss"
@@ -52,6 +54,12 @@ const Pill = ({ children }: { children: React.ReactNode }) => (
 
 const Frame = ({ children }: { children: React.ReactNode }) => (
   <div className="relative h-full w-full overflow-hidden bg-[#f5f1e8] px-20 py-14 font-serif text-stone-900">
+    <img
+      src={cloudsTaupe}
+      alt=""
+      aria-hidden="true"
+      className="pointer-events-none absolute -bottom-20 -left-12 h-[300px] w-[620px] object-cover opacity-20 mix-blend-multiply"
+    />
     <Corner pos="tl" />
     <Corner pos="tr" />
     <Corner pos="bl" />
@@ -64,6 +72,11 @@ const Frame = ({ children }: { children: React.ReactNode }) => (
 
 const SlideCover = () => (
   <Frame>
+    <img
+      src={cloudsTaupe}
+      alt="Nuvens em tom sépia usadas como referência visual do Genially"
+      className="pointer-events-none absolute left-0 top-0 h-full w-full object-cover opacity-25 mix-blend-multiply"
+    />
     <div className="grid h-full grid-cols-[1.1fr_1fr] items-center gap-10">
       <div>
         <h1 className="font-serif text-[56px] font-black uppercase leading-[1.05] tracking-tight">
@@ -82,21 +95,21 @@ const SlideCover = () => (
         </div>
       </div>
       <div className="flex h-full items-center justify-center">
-        <div className="relative h-[420px] w-[320px] overflow-hidden border border-stone-400 bg-stone-200 grayscale">
-          <svg viewBox="0 0 320 420" className="h-full w-full">
-            <defs>
-              <pattern id="hatch" patternUnits="userSpaceOnUse" width="3" height="3">
-                <path d="M0 3 L3 0" stroke="#2a2a2a" strokeWidth="0.4" />
-              </pattern>
-            </defs>
-            <rect width="320" height="420" fill="#d6cfc1" />
-            <ellipse cx="160" cy="150" rx="70" ry="90" fill="url(#hatch)" />
-            <ellipse cx="160" cy="150" rx="55" ry="70" fill="#5a5648" opacity="0.5" />
-            <path d="M90 220 Q160 240 230 220 L240 400 L80 400 Z" fill="url(#hatch)" />
-            <text x="160" y="410" textAnchor="middle" fontSize="10" fill="#2a2a2a" fontFamily="serif">
-              Sir George G. Stokes (1819–1903)
-            </text>
-          </svg>
+        <div className="relative h-[430px] w-[330px] border border-stone-400 bg-stone-200 p-3 shadow-xl">
+          <img
+            src={maxwellEngraving}
+            alt="Gravura acadêmica em estilo vintage usada como imagem de referência do slide Genially"
+            className="h-full w-full object-cover grayscale"
+          />
+          <img
+            src={cloudsTaupe}
+            alt=""
+            aria-hidden="true"
+            className="pointer-events-none absolute -bottom-9 -left-20 h-[170px] w-[410px] object-cover opacity-80 mix-blend-screen"
+          />
+          <div className="absolute inset-x-3 bottom-3 bg-stone-100/80 py-1 text-center text-[10px] font-bold uppercase tracking-wider text-stone-800">
+            Stokes • Faraday • Maxwell
+          </div>
         </div>
       </div>
     </div>
