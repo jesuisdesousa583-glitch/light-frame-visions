@@ -4,9 +4,9 @@ import { ChevronLeft, ChevronRight, Home } from "lucide-react";
 import maxwellPortrait from "@/assets/maxwell-engraving.jpg";
 import cloudsBg from "@/assets/clouds-taupe.jpg";
 
-const TAUPE = "#A89F86";
-const CREAM = "#F5EFE2";
-const INK = "#2B2A26";
+const TAUPE = "#8C8268";
+const CREAM = "#FBF6EA";
+const INK = "#1A1916";
 
 const slides = [
   {
@@ -293,7 +293,7 @@ export default function GeniallyMaxwell() {
       <div
         className="relative w-full max-w-[1600px] aspect-[16/9] overflow-hidden shadow-2xl"
         style={{
-          background: `url(${cloudsBg}) center/cover, ${TAUPE}`,
+          background: `linear-gradient(${CREAM}E6, ${CREAM}E6), url(${cloudsBg}) center/cover, ${TAUPE}`,
         }}
       >
         <Chrome i={i} n={n} />
