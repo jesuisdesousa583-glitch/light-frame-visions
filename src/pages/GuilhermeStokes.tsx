@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
-import { ChevronLeft, ChevronRight, Home } from "lucide-react";
+import { ChevronLeft, ChevronRight, Home, Tv, Smartphone, Radio } from "lucide-react";
 import cloudsTaupe from "@/assets/clouds-taupe.jpg";
 import stokesPortrait from "@/assets/stokes-portrait.webp";
 import vectorField from "@/assets/vector-field.webp";
