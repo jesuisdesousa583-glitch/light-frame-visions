@@ -15,6 +15,7 @@ import Schedule from "./pages/Schedule";
 import NotFound from "./pages/NotFound";
 import EscritorioKenia from "./pages/EscritorioKenia";
 import MaxwellStokes from "./pages/MaxwellStokes";
+import GeniallyMaxwell from "./pages/GeniallyMaxwell";
 import GeradorEolico from "./pages/GeradorEolico";
 import { DebugErrorThrower } from "@/components/debug/DebugErrorThrower";
 import { ErrorDebugPopup } from "@/components/debug/ErrorDebugPopup";
@@ -44,6 +45,7 @@ const App = () => (
             <Route path="/escritorio-kenia" element={<EscritorioKenia />} />
             <Route path="/maxwell-stokes" element={<MaxwellStokes />} />
             <Route path="/gerador-eolico" element={<GeradorEolico />} />
+            <Route path="/genially-maxwell" element={<GeniallyMaxwell />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
