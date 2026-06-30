@@ -44,6 +44,7 @@ const App = () => (
             <Route path="/escritorio-kenia" element={<EscritorioKenia />} />
             <Route path="/maxwell-stokes" element={<MaxwellStokes />} />
             <Route path="/gerador-eolico" element={<GeradorEolico />} />
+            <Route path="/genially-maxwell" element={<GeniallyMaxwell />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
