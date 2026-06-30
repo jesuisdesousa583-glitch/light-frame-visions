@@ -78,37 +78,37 @@ const SlideCover = () => (
       alt="Nuvens em tom sépia usadas como referência visual do Genially"
       className="pointer-events-none absolute left-0 top-0 h-full w-full object-cover opacity-25 mix-blend-multiply"
     />
-    <div className="grid h-full grid-cols-[1.1fr_1fr] items-center gap-10">
+    <div className="grid h-full grid-cols-[0.85fr_1.15fr] items-center gap-10">
       <div>
-        <h1 className="font-serif text-[56px] font-black uppercase leading-[1.05] tracking-tight">
+        <h1 className="font-serif text-[52px] font-black uppercase leading-[1.05] tracking-tight">
           Teorema de Stokes
           <br />e Rotacional
         </h1>
         <Pill>Disciplina: Cálculo III</Pill>
-        <div className="mt-20 space-y-1 text-base">
+        <div className="mt-14 space-y-1 text-base">
           <p className="text-stone-700">Prof: Daniel Yoshio Akamatsu</p>
           <p className="font-bold">Instituto Federal de Goiás — Campus Jataí</p>
         </div>
-        <div className="mt-16 space-y-0.5 text-base">
+        <div className="mt-10 space-y-0.5 text-base">
           <p>Alunos: Ana Beatriz Lima</p>
           <p className="ml-12">Pedro Henrique Souza</p>
           <p className="ml-12">Larissa Oliveira</p>
         </div>
       </div>
       <div className="flex h-full items-center justify-center">
-        <div className="relative h-[430px] w-[330px] border border-stone-400 bg-stone-200 p-3 shadow-xl">
+        <div className="relative h-[620px] w-[520px] border border-stone-400 bg-stone-200 p-4 shadow-2xl">
           <img
-            src={maxwellEngraving}
-            alt="Gravura acadêmica em estilo vintage usada como imagem de referência do slide Genially"
+            src={stokesPortraitAsset.url}
+            alt="Retrato de referência usado no slide"
             className="h-full w-full object-cover"
           />
           <img
             src={cloudsTaupe}
             alt=""
             aria-hidden="true"
-            className="pointer-events-none absolute -bottom-9 -left-20 h-[170px] w-[410px] object-cover opacity-80 mix-blend-screen"
+            className="pointer-events-none absolute -bottom-12 -left-24 h-[200px] w-[480px] object-cover opacity-70 mix-blend-screen"
           />
-          <div className="absolute inset-x-3 bottom-3 bg-stone-100/80 py-1 text-center text-[10px] font-bold uppercase tracking-wider text-stone-800">
+          <div className="absolute inset-x-4 bottom-4 bg-stone-100/85 py-1.5 text-center text-xs font-bold uppercase tracking-wider text-stone-800">
             Stokes • Faraday • Maxwell
           </div>
         </div>
