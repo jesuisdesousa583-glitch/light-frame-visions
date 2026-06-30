@@ -118,44 +118,24 @@ const SlideCover = () => (
 
 const SlideSumario = () => {
   const items = [
-    "Introdução",
-    "Contexto Histórico",
-    "Integrais de Linha",
-    "Rotacional de um Campo",
-    "Interpretação Física do Rotacional",
-    "Teorema de Stokes",
-    "Forma Vetorial e Forma Diferencial",
-    "Relação com o Teorema de Green",
-    "Lei de Faraday–Lenz",
-    "Lei de Ampère–Maxwell",
-    "Demonstração da Lei de Faraday via Stokes",
-    "Aplicação: Espira em Campo Variável",
-    "Aplicações em Engenharia Elétrica",
-    "Conclusão",
-    "Referências",
+    "Relaciona integrais de linha e de superfície",
+    "Aplicação em eletromagnetismo",
+    "Base matemática das Equações de Maxwell",
+    "Presente em tecnologias modernas",
   ];
   return (
     <Frame>
-      <h2 className="text-center text-[54px] font-black">Sumário</h2>
+      <div className="mb-2 text-[18px] uppercase tracking-[0.4em] text-stone-600">motivação</div>
+      <h2 className="text-[54px] font-black leading-tight">Por que estudar Stokes?</h2>
       <Divider />
-      <div className="grid grid-cols-[1fr_2fr] gap-8 pt-2">
-        <div className="border border-stone-400 bg-stone-200 p-2">
-          <svg viewBox="0 0 200 280" className="h-[420px] w-full grayscale">
-            <rect width="200" height="280" fill="#cfc8b8" />
-            <ellipse cx="100" cy="110" rx="50" ry="65" fill="#3d3a30" opacity="0.85" />
-            <path d="M55 175 Q100 195 145 175 L155 270 L45 270 Z" fill="#2a2820" />
-            <ellipse cx="100" cy="55" rx="55" ry="25" fill="#1a1812" />
-            <text x="100" y="278" textAnchor="middle" fontSize="7" fill="#1a1812">Stokes</text>
-          </svg>
-        </div>
-        <ol className="space-y-1 text-[22px] leading-relaxed">
-          {items.map((it, i) => (
-            <li key={i}>
-              <span className="font-bold">{i + 1}.</span> {it}
-            </li>
-          ))}
-        </ol>
-      </div>
+      <ul className="space-y-5 pt-6 text-[26px] leading-relaxed">
+        {items.map((it, i) => (
+          <li key={i} className="flex items-start gap-4">
+            <span className="mt-3 inline-block h-3 w-3 shrink-0 rounded-full bg-stone-800" />
+            <span>{it}</span>
+          </li>
+        ))}
+      </ul>
     </Frame>
   );
 };
