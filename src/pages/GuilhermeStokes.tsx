@@ -2,8 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import { ChevronLeft, ChevronRight, Home } from "lucide-react";
 import cloudsTaupe from "@/assets/clouds-taupe.jpg";
-import stokesPortraitAsset from "@/assets/stokes-portrait.webp.asset.json";
-const maxwellEngraving = stokesPortraitAsset.url;
+import stokesPortrait from "@/assets/stokes-portrait.webp";
 
 /**
  * Clone do estilo da apresentação "Equações de Maxwell e Teorema de Gauss"
@@ -98,7 +97,7 @@ const SlideCover = () => (
       <div className="flex h-full items-center justify-center">
         <div className="relative h-[620px] w-[520px] border border-stone-400 bg-stone-200 p-4 shadow-2xl">
           <img
-            src={stokesPortraitAsset.url}
+            src={stokesPortrait}
             alt="Retrato de referência usado no slide"
             className="h-full w-full object-cover"
           />
