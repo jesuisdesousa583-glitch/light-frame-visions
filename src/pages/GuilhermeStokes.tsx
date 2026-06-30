@@ -497,6 +497,8 @@ const slides = [
 
 export default function GuilhermeStokes() {
   const [i, setI] = useState(0);
+  const isPrintMode =
+    typeof window !== "undefined" && new URLSearchParams(window.location.search).has("print");
   const next = useCallback(() => setI((p) => Math.min(p + 1, slides.length - 1)), []);
   const prev = useCallback(() => setI((p) => Math.max(p - 1, 0)), []);
 
@@ -509,10 +511,49 @@ export default function GuilhermeStokes() {
     return () => window.removeEventListener("keydown", h);
   }, [next, prev]);
 
+  if (isPrintMode) {
+    return (
+      <div className="bg-stone-900 print:bg-white">
+        <style>{`
+          @page { size: 1280px 720px; margin: 0; }
+          html, body, #root { margin: 0; padding: 0; background: #ffffff; }
+          .guilherme-print-deck { width: 1280px; margin: 0 auto; }
+          .guilherme-print-page {
+            width: 1280px;
+            height: 720px;
+            overflow: hidden;
+            page-break-after: always;
+            break-after: page;
+            background: #f5f1e8;
+          }
+          .guilherme-print-page:last-child { page-break-after: auto; break-after: auto; }
+          @media screen {
+            .guilherme-print-deck { padding: 24px 0; }
+            .guilherme-print-page { margin: 0 auto 24px; box-shadow: 0 24px 80px rgba(0,0,0,.45); }
+          }
+        `}</style>
+        <main id="guilherme-stokes-print" className="guilherme-print-deck">
+          {slides.map((Slide, index) => (
+            <section
+              key={index}
+              className="guilherme-print-page"
+              data-slide-index={index + 1}
+              aria-label={`Slide ${index + 1}`}
+            >
+              <Slide />
+            </section>
+          ))}
+        </main>
+      </div>
+    );
+  }
+
   const Slide = slides[i];
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-stone-800 p-4">
       <div
+        id="guilherme-stokes-slide"
+        data-pdf-root="guilherme-stokes"
         className="relative shadow-2xl"
         style={{ width: "min(95vw, 1280px)", aspectRatio: "16/9" }}
       >
@@ -521,6 +562,9 @@ export default function GuilhermeStokes() {
       <div className="mt-4 flex items-center gap-3 text-stone-200">
         <Link to="/" className="flex items-center gap-1 rounded bg-stone-700 px-3 py-1.5 text-sm hover:bg-stone-600">
           <Home size={14} /> Home
+        </Link>
+        <Link to="/guilherme-stokes?print" target="_blank" className="rounded bg-stone-100 px-3 py-1.5 text-sm font-bold text-stone-900 hover:bg-stone-200">
+          Baixar / imprimir PDF
         </Link>
         <button onClick={prev} disabled={i === 0} className="rounded bg-stone-700 p-2 hover:bg-stone-600 disabled:opacity-30">
           <ChevronLeft size={18} />
