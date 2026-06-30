@@ -543,6 +543,7 @@ const slides = [
   SlideSumario,
   SlideHistorico,
   SlideCampoVetorial,
+  SlideCirculacao,
   SlideRotacional,
   SlideStokes,
   SlideFaraday,
