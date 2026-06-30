@@ -81,18 +81,17 @@ const SlideCover = () => (
     <div className="grid h-full grid-cols-2 items-center gap-8">
       <div>
         <h1 className="font-serif text-[58px] font-black uppercase leading-[1.05] tracking-tight">
-          Teorema de Stokes
-          <br />e Rotacional
+          Equações de Maxwell
+          <br />e Teorema de Stokes
         </h1>
-        <Pill>Disciplina: Cálculo III</Pill>
+        <Pill>Cálculo 3</Pill>
         <div className="mt-12 space-y-1 text-base">
-          <p className="text-stone-700">Prof: Daniel Yoshio Akamatsu</p>
-          <p className="font-bold">Instituto Federal de Goiás — Campus Jataí</p>
+          <p className="text-stone-700">Apresentação por:</p>
+          <p className="font-bold">Giovanna, Erik, Flávio e Reuel</p>
         </div>
         <div className="mt-8 space-y-0.5 text-base">
-          <p>Alunos: Ana Beatriz Lima</p>
-          <p className="ml-12">Pedro Henrique Souza</p>
-          <p className="ml-12">Larissa Oliveira</p>
+          <p className="italic text-stone-700">Giovanna Felippe da Silva</p>
+          <p className="text-stone-600">Criado em 25 de junho de 2026</p>
         </div>
       </div>
       <div className="flex h-full items-center justify-center">
