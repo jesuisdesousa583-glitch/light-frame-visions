@@ -13,6 +13,9 @@ const Index = () => {
           <Link to="/gerador-eolico" className="inline-block rounded-lg bg-emerald-500 px-6 py-3 font-semibold text-white hover:opacity-90">
             🌬️ Gerador Eólico (IFG) →
           </Link>
+          <Link to="/genially-maxwell" className="inline-block rounded-lg bg-[#A89F86] px-6 py-3 font-serif text-white hover:opacity-90">
+            ☁️ Maxwell &amp; Stokes — Cálculo 3 (Genially) →
+          </Link>
         </div>
       </div>
     </div>
