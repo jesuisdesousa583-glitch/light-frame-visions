@@ -65,7 +65,7 @@ const Frame = ({ children }: { children: React.ReactNode }) => (
     <Corner pos="tr" />
     <Corner pos="bl" />
     <Corner pos="br" />
-    <div className="relative z-10 h-full">{children}</div>
+    <div className="relative z-10 h-full" style={{ zoom: 1.15 }}>{children}</div>
   </div>
 );
 
@@ -448,6 +448,62 @@ const SlideAmpere = () => (
   </Frame>
 );
 
+const SlideStokesFaraday = () => (
+  <Frame>
+    <div className="flex items-center gap-3">
+      <Pill>Teorema</Pill>
+      <Pill>Lei de Faraday</Pill>
+    </div>
+    <h2 className="mt-3 text-[44px] font-black leading-tight">
+      Aplicando Stokes na Lei de Faraday
+    </h2>
+    <Divider />
+    <div className="grid grid-cols-[1.1fr_1fr] gap-10 pt-2">
+      <div className="space-y-4">
+        <div className="rounded border border-stone-400 bg-stone-100 p-5">
+          <div className="mb-1 text-[16px] uppercase tracking-widest text-stone-600">
+            Forma integral
+          </div>
+          <div className="text-center font-serif text-[26px]">
+            ∮<sub>C</sub> E⃗ · d r⃗ = − d/dt ∬<sub>S</sub> B⃗ · d S⃗
+          </div>
+        </div>
+        <div className="rounded border border-stone-400 bg-stone-100 p-5">
+          <div className="mb-1 text-[16px] uppercase tracking-widest text-stone-600">
+            Aplicando Stokes ao lado esquerdo
+          </div>
+          <div className="text-center font-serif text-[24px]">
+            ∮<sub>C</sub> E⃗ · d r⃗ = ∬<sub>S</sub> (∇ × E⃗) · d S⃗
+          </div>
+        </div>
+        <div className="rounded border-2 border-stone-900 bg-stone-50 p-5">
+          <div className="mb-1 text-[16px] uppercase tracking-widest text-stone-700">
+            Forma diferencial
+          </div>
+          <div className="text-center font-serif text-[28px] font-bold">
+            ∇ × E⃗ = − ∂B⃗/∂t
+          </div>
+        </div>
+      </div>
+      <div className="border-l-2 border-stone-400 pl-6">
+        <h3 className="text-[24px] font-black uppercase tracking-wider">Símbolos</h3>
+        <ul className="mt-3 space-y-2 text-[20px] leading-relaxed">
+          <li><b>E⃗</b> — campo elétrico</li>
+          <li><b>B⃗</b> — campo magnético</li>
+          <li><b>∬<sub>S</sub> B⃗ · dS⃗</b> — fluxo magnético (Φ<sub>B</sub>)</li>
+          <li><b>d/dt</b> — variação temporal</li>
+          <li><b>∇ ×</b> — rotacional</li>
+          <li><b>C = ∂S</b> — curva fechada que delimita <i>S</i></li>
+        </ul>
+        <p className="mt-4 border-l-4 border-stone-700 bg-stone-100 p-3 text-[18px] italic">
+          Um campo magnético variável no tempo gera um campo elétrico
+          rotacional — princípio da indução eletromagnética.
+        </p>
+      </div>
+    </div>
+  </Frame>
+);
+
 const SlideAplicacaoTeorema = () => (
   <Frame>
     <h2 className="text-[48px] font-black">Aplicação do Teorema</h2>
@@ -609,6 +665,7 @@ const slides = [
   SlideRotacionalSimbolos,
   SlideStokes,
   SlideFaraday,
+  SlideStokesFaraday,
   SlideAmpere,
   SlideAplicacaoTeorema,
   SlideAplicacao,
