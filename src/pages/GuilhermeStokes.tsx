@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Link } from "react-router-dom";
-import { ChevronLeft, ChevronRight, Home } from "lucide-react";
+import { ChevronLeft, ChevronRight, Home, Loader2, Play } from "lucide-react";
 import cloudsTaupe from "@/assets/clouds-taupe.jpg";
 import stokesPortrait from "@/assets/stokes-portrait.webp";
 import vectorField from "@/assets/vector-field.webp";
@@ -80,11 +80,115 @@ const Frame = ({ children }: { children: React.ReactNode }) => (
 
 // ============== SLIDES ==============
 
-const MAXWELL_VIDEO_URL = "/videos/maxwell.mp4";
+const MAXWELL_VIDEO_WEBM_URL = "/videos/maxwell.webm";
+const MAXWELL_VIDEO_MP4_URL = "/videos/maxwell.mp4";
+const MAXWELL_VIDEO_POSTER_URL = "/videos/maxwell-poster.jpg";
+
+const MaxwellVideo = ({ active, isPrint }: { active: boolean; isPrint: boolean }) => {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [status, setStatus] = useState<"idle" | "loading" | "ready" | "playing" | "error">(
+    active ? "loading" : "idle",
+  );
+
+  const playVideo = useCallback(async () => {
+    const video = videoRef.current;
+    if (!video || isPrint) return;
+    try {
+      video.muted = true;
+      video.loop = true;
+      video.playsInline = true;
+      await video.play();
+      setStatus("playing");
+    } catch {
+      setStatus("ready");
+    }
+  }, [isPrint]);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!active || !video || isPrint) return;
+
+    let cancelled = false;
+    setStatus("loading");
+
+    const markReady = () => {
+      if (cancelled) return;
+      setStatus("ready");
+      playVideo();
+    };
+
+    const markError = () => {
+      if (!cancelled) setStatus("error");
+    };
+
+    video.addEventListener("loadeddata", markReady, { once: true });
+    video.addEventListener("canplay", markReady, { once: true });
+    video.addEventListener("error", markError);
+    video.load();
+
+    if (video.readyState >= 2) markReady();
+
+    return () => {
+      cancelled = true;
+      video.pause();
+      video.removeEventListener("loadeddata", markReady);
+      video.removeEventListener("canplay", markReady);
+      video.removeEventListener("error", markError);
+    };
+  }, [active, isPrint, playVideo]);
+
+  if (isPrint) {
+    return (
+      <img
+        src={MAXWELL_VIDEO_POSTER_URL}
+        alt="Prévia do vídeo sobre Maxwell"
+        className="h-full w-full object-cover"
+      />
+    );
+  }
+
+  return (
+    <div className="relative h-full w-full overflow-hidden bg-stone-200">
+      <video
+        ref={videoRef}
+        className="h-full w-full object-cover"
+        poster={MAXWELL_VIDEO_POSTER_URL}
+        muted
+        loop
+        playsInline
+        controls
+        preload="auto"
+        onPlay={() => setStatus("playing")}
+        onPause={() => setStatus((current) => (current === "playing" ? "ready" : current))}
+      >
+        <source src={MAXWELL_VIDEO_WEBM_URL} type="video/webm" />
+        <source src={MAXWELL_VIDEO_MP4_URL} type="video/mp4" />
+      </video>
+
+      {status === "loading" && active && (
+        <div className="absolute inset-0 flex items-center justify-center bg-[#f5f1e8]/80 text-stone-800">
+          <Loader2 className="h-10 w-10 animate-spin" />
+        </div>
+      )}
+
+      {(status === "ready" || status === "error") && active && (
+        <button
+          type="button"
+          onClick={playVideo}
+          className="absolute inset-0 flex items-center justify-center bg-[#f5f1e8]/35 text-stone-900 transition hover:bg-[#f5f1e8]/20"
+          aria-label="Reproduzir vídeo"
+        >
+          <span className="flex h-20 w-20 items-center justify-center rounded-full border-2 border-stone-900 bg-[#f5f1e8]/90 shadow-lg">
+            <Play className="ml-1 h-9 w-9 fill-current" />
+          </span>
+        </button>
+      )}
+    </div>
+  );
+};
 
 const SlideCover = () => {
   const [showVideo, setShowVideo] = useState(false);
-  const videoRef = useRef<HTMLVideoElement>(null);
   const isPrint =
     typeof window !== "undefined" && new URLSearchParams(window.location.search).has("print");
 
@@ -96,12 +200,6 @@ const SlideCover = () => {
     const t = setTimeout(() => setShowVideo(true), 2000);
     return () => clearTimeout(t);
   }, [isPrint]);
-
-  useEffect(() => {
-    if (showVideo && videoRef.current && !isPrint) {
-      videoRef.current.play().catch(() => {});
-    }
-  }, [showVideo, isPrint]);
 
   return (
     <Frame>
@@ -142,15 +240,7 @@ const SlideCover = () => {
             style={{ opacity: showVideo ? 1 : 0 }}
           >
             {showVideo && (
-              <video
-                ref={videoRef}
-                src={MAXWELL_VIDEO_URL}
-                className="h-full w-full object-cover"
-                autoPlay
-                muted
-                loop
-                playsInline
-              />
+              <MaxwellVideo active={showVideo} isPrint={isPrint} />
             )}
             <div className="absolute inset-x-3 bottom-3 bg-[#f5f1e8]/90 py-2 text-center text-sm font-bold uppercase tracking-wider text-stone-800">
               Maxwell em movimento
