@@ -48,7 +48,7 @@ const Divider = () => (
 );
 
 const Pill = ({ children }: { children: React.ReactNode }) => (
-  <span className="inline-block bg-stone-900 px-3 py-1 text-[13px] font-bold uppercase tracking-wider text-stone-50">
+  <span className="inline-block bg-stone-900 px-3 py-1 text-[17px] font-bold uppercase tracking-wider text-stone-50">
     {children}
   </span>
 );
@@ -80,7 +80,7 @@ const SlideCover = () => (
     />
     <div className="grid h-full grid-cols-2 items-center gap-8">
       <div>
-        <h1 className="font-serif text-[48px] font-black uppercase leading-[1.05] tracking-tight">
+        <h1 className="font-serif text-[58px] font-black uppercase leading-[1.05] tracking-tight">
           Teorema de Stokes
           <br />e Rotacional
         </h1>
@@ -137,7 +137,7 @@ const SlideSumario = () => {
   ];
   return (
     <Frame>
-      <h2 className="text-center text-[44px] font-black">Sumário</h2>
+      <h2 className="text-center text-[54px] font-black">Sumário</h2>
       <Divider />
       <div className="grid grid-cols-[1fr_2fr] gap-8 pt-2">
         <div className="border border-stone-400 bg-stone-200 p-2">
@@ -149,7 +149,7 @@ const SlideSumario = () => {
             <text x="100" y="278" textAnchor="middle" fontSize="7" fill="#1a1812">Stokes</text>
           </svg>
         </div>
-        <ol className="space-y-1 text-[17px] leading-relaxed">
+        <ol className="space-y-1 text-[22px] leading-relaxed">
           {items.map((it, i) => (
             <li key={i}>
               <span className="font-bold">{i + 1}.</span> {it}
@@ -163,12 +163,12 @@ const SlideSumario = () => {
 
 const SlideHistorico = () => (
   <Frame>
-    <h2 className="text-center text-[40px] font-black">Contexto Histórico</h2>
+    <h2 className="text-center text-[48px] font-black">Contexto Histórico</h2>
     <Divider />
     <div className="grid grid-cols-2 gap-10 pt-4">
       <div>
         <h3 className="text-xl font-bold">Sir George G. Stokes (1819–1903)</h3>
-        <ul className="mt-4 list-disc space-y-2 pl-5 text-[15px]">
+        <ul className="mt-4 list-disc space-y-2 pl-5 text-[20px]">
           <li>Físico e matemático irlandês, professor em Cambridge.</li>
           <li>Generalizou o Teorema de Green para superfícies em ℝ³.</li>
           <li>Contribuições fundamentais em <b>hidrodinâmica</b> (equações de Navier–Stokes).</li>
@@ -178,7 +178,7 @@ const SlideHistorico = () => (
       </div>
       <div>
         <h3 className="text-xl font-bold">Michael Faraday (1791–1867)</h3>
-        <ul className="mt-4 list-disc space-y-2 pl-5 text-[15px]">
+        <ul className="mt-4 list-disc space-y-2 pl-5 text-[20px]">
           <li>Físico inglês, pioneiro do <b>eletromagnetismo experimental</b>.</li>
           <li>Descobriu a <b>indução eletromagnética</b> (1831).</li>
           <li>Introduziu o conceito de <b>linhas de campo</b>.</li>
@@ -192,17 +192,17 @@ const SlideHistorico = () => (
 
 const SlideRotacional = () => (
   <Frame>
-    <h2 className="text-center text-[42px] font-black">Rotacional de um Campo</h2>
+    <h2 className="text-center text-[50px] font-black">Rotacional de um Campo</h2>
     <Divider />
     <div className="grid grid-cols-3 gap-6 pt-3">
       <div>
         <Pill>Definição</Pill>
-        <p className="mt-3 text-[14px]">
+        <p className="mt-3 text-[18px]">
           O rotacional mede a tendência de um campo vetorial <i>F⃗</i> em produzir
           rotação local em torno de cada ponto do espaço.
         </p>
         <Pill>Expressão</Pill>
-        <div className="mt-3 border border-stone-700 p-3 text-center text-[15px]">
+        <div className="mt-3 border border-stone-700 p-3 text-center text-[20px]">
           ∇ × F⃗ = (∂F<sub>z</sub>/∂y − ∂F<sub>y</sub>/∂z) î
           <br />+ (∂F<sub>x</sub>/∂z − ∂F<sub>z</sub>/∂x) ĵ
           <br />+ (∂F<sub>y</sub>/∂x − ∂F<sub>x</sub>/∂y) k̂
@@ -217,19 +217,19 @@ const SlideRotacional = () => (
             className="h-auto w-full object-contain"
           />
         </div>
-        <p className="mt-2 text-center text-[13px] italic">
+        <p className="mt-2 text-center text-[17px] italic">
           Exemplo de campo vetorial: cada seta representa F⃗(x,y,z) em um ponto do espaço.
         </p>
       </div>
       <div>
         <Pill>Casos Notáveis</Pill>
-        <ul className="mt-3 space-y-2 text-[14px]">
+        <ul className="mt-3 space-y-2 text-[18px]">
           <li>• <b>Campo irrotacional:</b> ∇ × F⃗ = 0</li>
           <li>• <b>Campo solenoidal puro:</b> ∇ · F⃗ = 0</li>
           <li>• <b>Campo conservativo</b> ⇒ rotacional nulo</li>
           <li>• <b>Vórtice:</b> rotacional concentrado no eixo</li>
         </ul>
-        <div className="mt-4 border border-stone-700 bg-stone-100 p-3 text-[13px]">
+        <div className="mt-4 border border-stone-700 bg-stone-100 p-3 text-[17px]">
           <b>Observação:</b> ∇ × (∇φ) = 0 — o rotacional de um gradiente é
           sempre nulo.
         </div>
@@ -240,19 +240,19 @@ const SlideRotacional = () => (
 
 const SlideStokes = () => (
   <Frame>
-    <h2 className="text-center text-[44px] font-black">Teorema de Stokes</h2>
+    <h2 className="text-center text-[54px] font-black">Teorema de Stokes</h2>
     <Divider />
     <div className="grid grid-cols-[1fr_1.1fr_1fr] gap-6 pt-3">
       <div>
         <Pill>Enunciado</Pill>
-        <p className="mt-2 text-[14px]">
+        <p className="mt-2 text-[18px]">
           Seja <i>S</i> uma superfície orientada, suave por partes, limitada pela
           curva fechada <i>∂S</i>. Então:
         </p>
-        <div className="mt-3 border border-stone-700 p-3 text-center text-[18px]">
+        <div className="mt-3 border border-stone-700 p-3 text-center text-[23px]">
           ∮<sub>∂S</sub> F⃗ · dr⃗ = ∬<sub>S</sub> (∇ × F⃗) · dS⃗
         </div>
-        <p className="mt-3 text-[14px]">
+        <p className="mt-3 text-[18px]">
           A circulação ao longo de <i>∂S</i> equivale ao fluxo do rotacional
           através de <i>S</i>.
         </p>
@@ -278,13 +278,13 @@ const SlideStokes = () => (
       </div>
       <div>
         <Pill>Condições</Pill>
-        <ul className="mt-3 list-disc space-y-1 pl-5 text-[14px]">
+        <ul className="mt-3 list-disc space-y-1 pl-5 text-[18px]">
           <li><i>S</i> é orientável e suave por partes.</li>
           <li><i>∂S</i> é curva fechada simples, percorrida positivamente.</li>
           <li><i>F⃗</i> tem componentes com derivadas parciais contínuas.</li>
         </ul>
         <Pill>Casos Particulares</Pill>
-        <ul className="mt-2 list-disc space-y-1 pl-5 text-[14px]">
+        <ul className="mt-2 list-disc space-y-1 pl-5 text-[18px]">
           <li>Se <i>S</i> ⊂ plano <i>xy</i> ⇒ <b>Teorema de Green</b>.</li>
           <li>Se ∇ × F⃗ = 0 ⇒ circulação nula em qualquer ∂S.</li>
         </ul>
@@ -295,37 +295,37 @@ const SlideStokes = () => (
 
 const SlideFaraday = () => (
   <Frame>
-    <h2 className="text-center text-[40px] font-black">Lei de Faraday–Lenz</h2>
+    <h2 className="text-center text-[48px] font-black">Lei de Faraday–Lenz</h2>
     <Divider />
     <div className="grid grid-cols-2 gap-8 pt-3">
       <div>
         <Pill>Forma Integral</Pill>
-        <div className="mt-3 border border-stone-700 p-3 text-center text-[17px]">
+        <div className="mt-3 border border-stone-700 p-3 text-center text-[22px]">
           ∮<sub>C</sub> E⃗ · dr⃗ = − d/dt ∬<sub>S</sub> B⃗ · dS⃗
         </div>
-        <p className="mt-3 text-[14px]">
+        <p className="mt-3 text-[18px]">
           A força eletromotriz induzida em um circuito fechado é igual ao oposto
           da taxa de variação do fluxo magnético através de qualquer superfície
           limitada por esse circuito.
         </p>
         <Pill>Forma Diferencial</Pill>
-        <div className="mt-3 border border-stone-700 p-3 text-center text-[17px]">
+        <div className="mt-3 border border-stone-700 p-3 text-center text-[22px]">
           ∇ × E⃗ = − ∂B⃗/∂t
         </div>
-        <p className="mt-3 text-[14px]">
+        <p className="mt-3 text-[18px]">
           Obtida aplicando o <b>Teorema de Stokes</b> à forma integral.
         </p>
       </div>
       <div>
         <Pill>Interpretação Física</Pill>
-        <ul className="mt-3 list-disc space-y-2 pl-5 text-[14px]">
+        <ul className="mt-3 list-disc space-y-2 pl-5 text-[18px]">
           <li>Campos magnéticos variáveis geram campos elétricos rotacionais.</li>
           <li>O sinal negativo expressa a <b>Lei de Lenz</b>: a corrente
             induzida se opõe à variação que a originou.</li>
           <li>Princípio de funcionamento de <b>geradores, transformadores,
             dínamos e indutores</b>.</li>
         </ul>
-        <div className="mt-4 border border-stone-700 bg-stone-100 p-3 text-[13px]">
+        <div className="mt-4 border border-stone-700 bg-stone-100 p-3 text-[17px]">
           <b>Importante:</b> Stokes é a ponte matemática que transforma a
           forma global (integral) na forma local (diferencial) das equações
           de Maxwell.
@@ -337,19 +337,19 @@ const SlideFaraday = () => (
 
 const SlideAmpere = () => (
   <Frame>
-    <h2 className="text-center text-[40px] font-black">Lei de Ampère–Maxwell</h2>
+    <h2 className="text-center text-[48px] font-black">Lei de Ampère–Maxwell</h2>
     <Divider />
     <div className="grid grid-cols-2 gap-8 pt-3">
       <div>
         <Pill>Forma Integral</Pill>
-        <div className="mt-3 border border-stone-700 p-3 text-center text-[16px]">
+        <div className="mt-3 border border-stone-700 p-3 text-center text-[21px]">
           ∮<sub>C</sub> B⃗ · dr⃗ = μ₀ I<sub>enc</sub> + μ₀ε₀ d/dt ∬<sub>S</sub> E⃗ · dS⃗
         </div>
         <Pill>Forma Diferencial</Pill>
-        <div className="mt-3 border border-stone-700 p-3 text-center text-[16px]">
+        <div className="mt-3 border border-stone-700 p-3 text-center text-[21px]">
           ∇ × B⃗ = μ₀ J⃗ + μ₀ε₀ ∂E⃗/∂t
         </div>
-        <p className="mt-3 text-[14px]">
+        <p className="mt-3 text-[18px]">
           Maxwell adicionou o termo da <b>corrente de deslocamento</b>
           (μ₀ε₀ ∂E⃗/∂t), tornando o sistema consistente e prevendo as
           <b> ondas eletromagnéticas</b>.
@@ -357,10 +357,10 @@ const SlideAmpere = () => (
       </div>
       <div>
         <Pill>Aplicação do Teorema de Stokes</Pill>
-        <p className="mt-3 text-[14px]">
+        <p className="mt-3 text-[18px]">
           Partindo da forma integral e aplicando Stokes ao lado esquerdo:
         </p>
-        <div className="mt-3 space-y-2 border border-stone-700 p-3 text-[14px]">
+        <div className="mt-3 space-y-2 border border-stone-700 p-3 text-[18px]">
           <p>∮<sub>C</sub> B⃗ · dr⃗ = ∬<sub>S</sub> (∇ × B⃗) · dS⃗</p>
           <p>⇒ ∬<sub>S</sub> (∇ × B⃗) · dS⃗ = ∬<sub>S</sub> (μ₀J⃗ + μ₀ε₀ ∂E⃗/∂t) · dS⃗</p>
           <p>Como vale para toda superfície <i>S</i>:</p>
@@ -375,7 +375,7 @@ const SlideAmpere = () => (
 
 const SlideAplicacao = () => (
   <Frame>
-    <h2 className="text-center text-[38px] font-black">
+    <h2 className="text-center text-[46px] font-black">
       Aplicação: Espira em Campo Magnético Variável
     </h2>
     <Divider />
@@ -401,17 +401,17 @@ const SlideAplicacao = () => (
       </div>
       <div>
         <Pill>Enunciado</Pill>
-        <p className="mt-2 text-[14px]">
+        <p className="mt-2 text-[18px]">
           Uma espira retangular de área <i>A</i> está imersa em um campo
           magnético uniforme <i>B(t) = B₀ cos(ωt)</i> perpendicular ao plano.
         </p>
         <Pill>Cálculo da FEM</Pill>
-        <div className="mt-2 space-y-1 border border-stone-700 p-3 text-[14px]">
+        <div className="mt-2 space-y-1 border border-stone-700 p-3 text-[18px]">
           <p>Φ<sub>B</sub> = B(t) · A = B₀ A cos(ωt)</p>
           <p>ε = − dΦ<sub>B</sub>/dt = B₀ A ω sen(ωt)</p>
           <p className="font-bold">ε<sub>máx</sub> = B₀ A ω</p>
         </div>
-        <p className="mt-3 text-[14px]">
+        <p className="mt-3 text-[18px]">
           Este é o princípio do <b>gerador de corrente alternada</b>: uma espira
           girando em um campo constante produz fluxo variável e, portanto, FEM
           senoidal.
@@ -423,9 +423,9 @@ const SlideAplicacao = () => (
 
 const SlideAplicacoesEng = () => (
   <Frame>
-    <h2 className="text-center text-[40px] font-black">Aplicações em Engenharia</h2>
+    <h2 className="text-center text-[48px] font-black">Aplicações em Engenharia</h2>
     <Divider />
-    <div className="grid grid-cols-2 gap-x-12 gap-y-5 pt-4 text-[15px]">
+    <div className="grid grid-cols-2 gap-x-12 gap-y-5 pt-4 text-[20px]">
       {[
         ["Geradores Elétricos", "Conversão de energia mecânica em elétrica via variação de fluxo magnético."],
         ["Transformadores", "Indução mútua entre bobinas, regida por ∇ × E⃗ = −∂B⃗/∂t."],
@@ -436,7 +436,7 @@ const SlideAplicacoesEng = () => (
       ].map(([title, desc]) => (
         <div key={title} className="border-l-4 border-stone-900 pl-4">
           <h3 className="font-bold">{title}</h3>
-          <p className="text-[14px] text-stone-700">{desc}</p>
+          <p className="text-[18px] text-stone-700">{desc}</p>
         </div>
       ))}
     </div>
@@ -445,9 +445,9 @@ const SlideAplicacoesEng = () => (
 
 const SlideConclusao = () => (
   <Frame>
-    <h2 className="text-center text-[44px] font-black">Conclusão</h2>
+    <h2 className="text-center text-[54px] font-black">Conclusão</h2>
     <Divider />
-    <div className="mx-auto max-w-3xl pt-6 text-[16px] leading-relaxed">
+    <div className="mx-auto max-w-3xl pt-6 text-[21px] leading-relaxed">
       <p>
         O <b>Teorema de Stokes</b> é a ferramenta central do Cálculo Vetorial
         que conecta a circulação de um campo ao longo de uma curva fechada
@@ -471,9 +471,9 @@ const SlideConclusao = () => (
 
 const SlideReferencias = () => (
   <Frame>
-    <h2 className="text-center text-[40px] font-black">Referências</h2>
+    <h2 className="text-center text-[48px] font-black">Referências</h2>
     <Divider />
-    <ul className="space-y-3 pt-4 text-[14px] leading-relaxed">
+    <ul className="space-y-3 pt-4 text-[18px] leading-relaxed">
       <li>STEWART, James. <b>Cálculo</b>. 8. ed. São Paulo: Cengage Learning, 2016. v. 2.</li>
       <li>THOMAS, George B.; WEIR, M. D.; HASS, J. <b>Cálculo</b>. 12. ed. São Paulo: Pearson, 2013. v. 2.</li>
       <li>HALLIDAY, D.; RESNICK, R.; WALKER, J. <b>Fundamentos de Física: eletromagnetismo</b>. 10. ed. Rio de Janeiro: LTC, 2016. v. 3.</li>
