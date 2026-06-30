@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { ChevronLeft, ChevronRight, Home } from "lucide-react";
 import cloudsTaupe from "@/assets/clouds-taupe.jpg";
 import stokesPortrait from "@/assets/stokes-portrait.webp";
+import vectorField from "@/assets/vector-field.webp";
 
 /**
  * Clone do estilo da apresentação "Equações de Maxwell e Teorema de Gauss"
@@ -209,27 +210,16 @@ const SlideRotacional = () => (
       </div>
       <div>
         <Pill>Interpretação Geométrica</Pill>
-        <svg viewBox="0 0 220 220" className="mt-3 w-full">
-          <circle cx="110" cy="110" r="70" fill="none" stroke="#1a1a1a" />
-          <circle cx="110" cy="110" r="45" fill="none" stroke="#1a1a1a" />
-          {[0, 60, 120, 180, 240, 300].map((a) => {
-            const r = (a * Math.PI) / 180;
-            const x = 110 + 70 * Math.cos(r);
-            const y = 110 + 70 * Math.sin(r);
-            const x2 = 110 + 70 * Math.cos(r + 0.3);
-            const y2 = 110 + 70 * Math.sin(r + 0.3);
-            return (
-              <line key={a} x1={x} y1={y} x2={x2} y2={y2} stroke="#1a1a1a" strokeWidth="1.5" markerEnd="url(#arr)" />
-            );
-          })}
-          <defs>
-            <marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
-              <path d="M0,0 L6,3 L0,6 z" fill="#1a1a1a" />
-            </marker>
-          </defs>
-          <text x="110" y="115" textAnchor="middle" fontSize="14" fontStyle="italic">F⃗</text>
-        </svg>
-        <p className="text-center text-[13px] italic">Vetores tangentes indicam rotação local.</p>
+        <div className="mt-3 border border-stone-700 bg-stone-100 p-2">
+          <img
+            src={vectorField}
+            alt="Campo vetorial — visualização de vetores tangentes e rotação local"
+            className="h-auto w-full object-contain"
+          />
+        </div>
+        <p className="mt-2 text-center text-[13px] italic">
+          Exemplo de campo vetorial: cada seta representa F⃗(x,y,z) em um ponto do espaço.
+        </p>
       </div>
       <div>
         <Pill>Casos Notáveis</Pill>
