@@ -716,6 +716,7 @@ export default function GuilhermeStokes() {
             <section
               key={index}
               className="guilherme-print-page"
+              data-slide="1"
               data-slide-index={index + 1}
               aria-label={`Slide ${index + 1}`}
             >
