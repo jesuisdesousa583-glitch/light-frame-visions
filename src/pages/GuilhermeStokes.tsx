@@ -80,7 +80,7 @@ const SlideCover = () => (
     />
     <div className="grid h-full grid-cols-2 items-center gap-8">
       <div>
-        <h1 className="font-serif text-[58px] font-black uppercase leading-[1.05] tracking-tight">
+        <h1 className="font-serif text-[42px] font-bold uppercase leading-[1.1] tracking-[0.02em]">
           Equações de Maxwell
           <br />e Teorema de Stokes
         </h1>
