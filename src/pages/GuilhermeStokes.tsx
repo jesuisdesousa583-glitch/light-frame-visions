@@ -189,7 +189,6 @@ const MaxwellVideo = ({ active, isPrint }: { active: boolean; isPrint: boolean }
 
 const SlideCover = () => {
   const [showVideo, setShowVideo] = useState(false);
-  const videoRef = useRef<HTMLVideoElement>(null);
   const isPrint =
     typeof window !== "undefined" && new URLSearchParams(window.location.search).has("print");
 
@@ -201,12 +200,6 @@ const SlideCover = () => {
     const t = setTimeout(() => setShowVideo(true), 2000);
     return () => clearTimeout(t);
   }, [isPrint]);
-
-  useEffect(() => {
-    if (showVideo && videoRef.current && !isPrint) {
-      videoRef.current.play().catch(() => {});
-    }
-  }, [showVideo, isPrint]);
 
   return (
     <Frame>
