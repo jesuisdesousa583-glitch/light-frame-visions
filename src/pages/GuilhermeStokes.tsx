@@ -139,7 +139,7 @@ const SlideSumario = () => {
           </li>
         ))}
       </ul>
-      <div className="mt-8 grid grid-cols-3 gap-6">
+      <div className="mt-6 grid grid-cols-3 gap-4">
         {[
           { img: vintageTv, label: "Televisão" },
           { img: smartphoneImg, label: "Celular" },
@@ -147,15 +147,15 @@ const SlideSumario = () => {
         ].map(({ img, label }) => (
           <div
             key={label}
-            className="flex flex-col items-center gap-2 rounded-md border-2 border-stone-700 bg-stone-100/60 p-3"
+            className="flex flex-col items-center gap-1 rounded-md border-2 border-stone-700 bg-stone-100/60 p-2"
           >
             <img
               src={img}
               alt={label}
-              className="h-32 w-full object-contain"
+              className="h-20 w-full object-contain"
               loading="lazy"
             />
-            <span className="text-[18px] font-bold uppercase tracking-wider text-stone-800">
+            <span className="text-[16px] font-bold uppercase tracking-wider text-stone-800">
               {label}
             </span>
           </div>
