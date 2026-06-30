@@ -80,8 +80,7 @@ const Frame = ({ children }: { children: React.ReactNode }) => (
 
 // ============== SLIDES ==============
 
-const MAXWELL_VIDEO_URL =
-  "https://ajwelsrtjunkbzqlxtkb.supabase.co/storage/v1/object/sign/debug-files/1782792831845-putf41-Digen_video_1782792482866.mp4?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9jYTNiOGMxMS1lNmM4LTQ3MWMtYjZjNS0zY2U2ZGZhMGViMmIiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJkZWJ1Zy1maWxlcy8xNzgyNzkyODMxODQ1LXB1dGY0MS1EaWdlbl92aWRlb18xNzgyNzkyNDgyODY2Lm1wNCIsInNjb3BlIjoiZG93bmxvYWQiLCJpYXQiOjE3ODI3OTI4MzgsImV4cCI6MTgxNDMyODgzOH0.IIXaCaUbbGTlkr6PpKZ6Rr-7KsxXzYXDXiaORC7Jgdc";
+const MAXWELL_VIDEO_URL = "/videos/maxwell.mp4";
 
 const SlideCover = () => {
   const [showVideo, setShowVideo] = useState(false);
