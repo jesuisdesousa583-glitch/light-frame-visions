@@ -19,6 +19,7 @@ import GeniallyMaxwell from "./pages/GeniallyMaxwell";
 import GeradorEolico from "./pages/GeradorEolico";
 import GuilhermeStokes from "./pages/GuilhermeStokes";
 import Pamonhas from "./pages/Pamonhas";
+import ProductDetail from "./pages/ProductDetail";
 import { DebugErrorThrower } from "@/components/debug/DebugErrorThrower";
 import { ErrorDebugPopup } from "@/components/debug/ErrorDebugPopup";
 
@@ -50,6 +51,7 @@ const App = () => (
             <Route path="/genially-maxwell" element={<GeniallyMaxwell />} />
             <Route path="/guilherme-stokes" element={<GuilhermeStokes />} />
             <Route path="/pamonhas" element={<Pamonhas />} />
+            <Route path="/product/:handle" element={<ProductDetail />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
