@@ -13,14 +13,14 @@ export default function ProductDetail() {
   const busy = useCartStore((s) => s.isLoading);
 
   if (isLoading) return <div className="flex justify-center py-32"><Loader2 className="h-8 w-8 animate-spin" /></div>;
-  if (!product) return <div className="container py-20">Produto não encontrado. <Link to="/pamonhas" className="text-primary">Voltar</Link></div>;
+  if (!product) return <div className="container py-20">Produto não encontrado. <Link to="/" className="text-primary">Voltar</Link></div>;
 
   const v = product.node.variants.edges[0]?.node;
   const img = product.node.images.edges[0]?.node;
   return (
     <div className="min-h-screen bg-secondary/40">
       <div className="container py-6 flex justify-between items-center">
-        <Link to="/pamonhas" className="flex items-center gap-2 text-primary"><ArrowLeft className="h-4 w-4" />Cardápio</Link>
+        <Link to="/" className="flex items-center gap-2 text-primary"><ArrowLeft className="h-4 w-4" />Cardápio</Link>
         <PamonhaCart />
       </div>
       <div className="container pb-16 grid md:grid-cols-2 gap-10">
