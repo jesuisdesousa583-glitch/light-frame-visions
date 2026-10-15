@@ -38,7 +38,7 @@ const App = () => (
         <AuthProvider>
           <ErrorDebugPopup />
           <Routes>
-            <Route path="/" element={<Pamonhas />} />
+            <Route path="/" element={<Delivery />} />
             <Route path="/mindcare" element={<Landing />} />
             <Route path="/auth" element={<Auth />} />
             <Route path="/therapists" element={<TherapistList />} />
