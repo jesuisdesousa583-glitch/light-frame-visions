@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { Search, Star, Clock, Bike, ArrowLeft, ShoppingBag, Plus, Minus, MapPin, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { TrackingMap } from "@/components/delivery/TrackingMap";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 
 type Item = { id: string; nome: string; desc: string; preco: number; emoji: string };
@@ -49,7 +50,7 @@ export default function Delivery() {
   const [aberto, setAberto] = useState(false);
   const [endereco, setEndereco] = useState("");
   const [pago, setPago] = useState("pix");
-  const [feito, setFeito] = useState(false);
+  const [feito, setFeito] = useState<string | null>(null);
 
   const lista = useMemo(() => LOJAS.filter((l) =>
     (cat === "todos" || l.cat === cat) &&
@@ -160,24 +161,20 @@ export default function Delivery() {
         )}
       </main>
 
-      {cart && (
+      {(cart || feito) && (
         <div className="fixed bottom-0 inset-x-0 p-4 z-30">
           <button onClick={() => setAberto(true)} className="max-w-5xl mx-auto w-full flex items-center justify-between bg-primary text-primary-foreground rounded-xl px-5 py-4 font-semibold shadow-lg">
-            <span className="flex items-center gap-2"><ShoppingBag className="h-5 w-5" />{qtdTotal} item(ns)</span>
-            <span>Ver sacola · {brl(total)}</span>
+            {feito && !cart ? <span className="w-full text-center">🛵 Acompanhar entrega ao vivo</span> : <><span className="flex items-center gap-2"><ShoppingBag className="h-5 w-5" />{qtdTotal} item(ns)</span>
+            <span>Ver sacola · {brl(total)}</span></>}
           </button>
         </div>
       )}
 
-      <Sheet open={aberto} onOpenChange={(o) => { setAberto(o); if (!o) setFeito(false); }}>
+      <Sheet open={aberto} onOpenChange={(o) => { setAberto(o);  }}>
         <SheetContent className="theme-delivery w-full sm:max-w-md flex flex-col">
-          <SheetHeader><SheetTitle>{feito ? "Pedido confirmado" : `Sacola · ${cart?.loja.nome ?? ""}`}</SheetTitle></SheetHeader>
+          <SheetHeader><SheetTitle>{feito ? "Acompanhe seu pedido" : `Sacola · ${cart?.loja.nome ?? ""}`}</SheetTitle></SheetHeader>
           {feito ? (
-            <div className="flex-1 flex flex-col items-center justify-center text-center gap-3">
-              <CheckCircle2 className="h-16 w-16 text-primary" />
-              <p className="text-lg font-bold">Seu pedido está sendo preparado!</p>
-              <p className="text-muted-foreground">Previsão: {cart?.loja.tempo ?? "30-40"} min</p>
-            </div>
+            <div className="flex-1 overflow-y-auto pt-4"><TrackingMap loja={feito} /></div>
           ) : (
             <>
               <div className="flex-1 overflow-y-auto space-y-3 py-4">
@@ -197,7 +194,7 @@ export default function Delivery() {
                   ))}
                 </div>
               </div>
-              <Button size="lg" disabled={!endereco || !cart} onClick={() => { setFeito(true); setCart(null); }}>Fazer pedido · {brl(total)}</Button>
+              <Button size="lg" disabled={!endereco || !cart} onClick={() => { setFeito(cart!.loja.nome); setCart(null); }}>Fazer pedido · {brl(total)}</Button>
             </>
           )}
         </SheetContent>
