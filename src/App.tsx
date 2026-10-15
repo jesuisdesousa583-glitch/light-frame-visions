@@ -20,6 +20,7 @@ import GeradorEolico from "./pages/GeradorEolico";
 import GuilhermeStokes from "./pages/GuilhermeStokes";
 import Pamonhas from "./pages/Pamonhas";
 import ProductDetail from "./pages/ProductDetail";
+import Delivery from "./pages/Delivery";
 import { DebugErrorThrower } from "@/components/debug/DebugErrorThrower";
 import { ErrorDebugPopup } from "@/components/debug/ErrorDebugPopup";
 
@@ -53,6 +54,7 @@ const App = () => (
             <Route path="/guilherme-stokes" element={<GuilhermeStokes />} />
             <Route path="/pamonhas" element={<Pamonhas />} />
             <Route path="/product/:handle" element={<ProductDetail />} />
+            <Route path="/delivery" element={<Delivery />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>

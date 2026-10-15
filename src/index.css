@@ -152,3 +152,21 @@
     box-shadow: var(--shadow-glow);
   }
 }
+
+.theme-delivery {
+  --background: 0 0% 98%;
+  --foreground: 0 0% 12%;
+  --card: 0 0% 100%;
+  --card-foreground: 0 0% 12%;
+  --primary: 354 84% 50%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 354 60% 96%;
+  --secondary-foreground: 354 70% 35%;
+  --muted: 0 0% 94%;
+  --muted-foreground: 0 0% 42%;
+  --border: 0 0% 88%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 0 0% 12%;
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+}
